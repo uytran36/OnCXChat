@@ -1,20 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Provider, useSelector } from 'react-redux';
+
+import ChatScreen from './src/screens/ChatScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import { store } from './src/store';
+
+const Stack = createNativeStackNavigator();
+
+const Navigation = () => {
+  // const isLogin = useSelector(state => state?.user?.isLogin ?? false);
+
+  // if (!isLogin) {
+  //   return <LoginScreen />;
+  // }
+
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Chat" component={ChatScreen} />
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Navigation />
+      </NavigationContainer>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
