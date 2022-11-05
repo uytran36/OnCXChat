@@ -39,12 +39,15 @@ export default styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  online: {
+  status: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: '#02d302',
     marginLeft: 4,
+  },
+  offline: {
+    backgroundColor: '#d9d9d9',
   },
   time: {
     position: 'absolute',

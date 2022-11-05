@@ -56,6 +56,8 @@ export class SetupSocket {
           heartbeatOutgoing: 10000,
           ...configs,
           brokerURL: `${REACT_APP_WEBSOCKET_SSL}/websocket-chat`,
+          forceBinaryWSFrames: true,
+          appendMissingNULLonIncoming: true,
           beforeConnect: () => {
             this.isConnected = true;
           },
@@ -79,16 +81,16 @@ export class SetupSocket {
     return this.isConnected;
   }
 
-  onWatchListRooms(onRefetchListRoom, { username }) {
+  onWatchListRooms(_, onRefetchListRoom) {
     try {
-      if (!this.StompClient || !username) {
+      if (!this.StompClient) {
         throw 'ERROR #361';
       }
       if (!this.StompClient.connected) {
         throw 'ERROR #399';
       }
       const { unsubscribe } = this.StompClient.subscribe(
-        `/topic/omni-chat-refresh-room/${username}`,
+        `/topic/event-room`,
         this.#handleParseJson(onRefetchListRoom),
       );
       return {
@@ -109,21 +111,22 @@ export class SetupSocket {
    * @param {string} username
    * @returns {OnWatchMessage}
    */
-  onWatchMessages(onRefetchListMessage, { roomId, username }) {
-    if (this.StompClient && username) {
+  onWatchMessages(onRefetchListMessage, { roomId }) {
+    if (this.StompClient) {
       if (roomId && this.StompClient.connected) {
         const subscription = this.StompClient.subscribe(
-          `/topic/${username}/${roomId}`,
+          `/topic/new-message/${roomId}`,
           this.#handleParseJson(onRefetchListMessage),
-          {
-            roomId,
-            id: roomId,
-          },
+          // {
+          //   roomId,
+          //   id: roomId,
+          // },
         );
         return subscription;
       }
     }
   }
+
   /**
    * @typedef {Object} onWatchReadTimestamp
    * @property {Function} subscription.unsubscribe

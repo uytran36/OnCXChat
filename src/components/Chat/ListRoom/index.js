@@ -1,18 +1,41 @@
-import PropTypes from 'prop-types';
-import { useCallback, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import { VirtualizedList } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useHeaders } from '../../../contexts';
 import { requestGetRoomsInfo } from '../../../services/chat';
-import { saveLoadMore, setFilter } from '../../../store/chat';
+import { saveLoadMore, saveState, setFilter } from '../../../store/chat';
+import Loading from '../../Loading';
 
 import Room from '../Room';
 
-const ListRoom = ({ listRoom }) => {
+const ListRoom = () => {
   const { filter, roomsInfo } = useSelector(state => state.chat);
   const dispatch = useDispatch();
 
+  const headers = useHeaders();
+
+  const [isFetching, setIsFetching] = useState(false);
   const [isLoadMore, setIsLoadMore] = useState(false);
+
+  const getRoomsInfo = useCallback(async () => {
+    if (!filter.page) {
+      setIsFetching(true);
+      const res = await requestGetRoomsInfo(headers, filter);
+      setIsFetching(false);
+      if (res.status === 200) {
+        dispatch(
+          saveState({
+            roomsInfo: res.data.response.roomsInfo,
+          }),
+        );
+      }
+    }
+  }, [filter, dispatch]);
+
+  useLayoutEffect(() => {
+    getRoomsInfo();
+  }, [getRoomsInfo]);
 
   const renderItem = useCallback(({ item }) => <Room info={item} />, []);
 
@@ -27,7 +50,7 @@ const ListRoom = ({ listRoom }) => {
       const newFilter = { ...filter, page: filter.page + 1 };
       dispatch(setFilter(newFilter));
       setIsLoadMore(true);
-      const res = await requestGetRoomsInfo(newFilter);
+      const res = await requestGetRoomsInfo(headers, newFilter);
       setIsLoadMore(false);
       if (res.status === 200) {
         dispatch(saveLoadMore(res.data.response.roomsInfo));
@@ -35,9 +58,13 @@ const ListRoom = ({ listRoom }) => {
     }
   }, [filter, roomsInfo, isLoadMore]);
 
+  if (isFetching) {
+    return <Loading />;
+  }
+
   return (
     <VirtualizedList
-      data={listRoom ?? []}
+      data={roomsInfo?.rooms ?? []}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       getItemCount={getItemCount}
@@ -46,14 +73,6 @@ const ListRoom = ({ listRoom }) => {
       onEndReachedThreshold={0.5}
     />
   );
-};
-
-ListRoom.propTypes = {
-  listRoom: PropTypes.array,
-};
-
-ListRoom.defaultProps = {
-  listRoom: [],
 };
 
 export default ListRoom;

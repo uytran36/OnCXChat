@@ -48,6 +48,7 @@ const Room = ({ info }) => {
             ? 'Bạn: '
             : `${info?.lastMessage?.senderName}: `,
       },
+      liveChatClose: info?.livechatSession?.liveChatClose ?? false,
     };
   }, [info, user]);
 
@@ -67,7 +68,11 @@ const Room = ({ info }) => {
             <Text style={styles.title} numberOfLines={1}>
               {data?.roomName ?? ''}
             </Text>
-            <View style={styles.online}></View>
+            <View
+              style={[
+                styles.status,
+                data?.liveChatClose && styles.offline,
+              ]}></View>
           </View>
           <Text style={styles.time}>{data?.timeConvention}</Text>
         </View>
