@@ -1,14 +1,14 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import moment from 'moment';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import * as encoding from 'text-encoding'; // don't remove this line
+import RootContext from './src/contexts';
+import { reset, setFilter } from './src/store/chat';
 
 import ChatScreen from './src/screens/ChatScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import { store } from './src/store';
-import { setFilter, reset } from './src/store/chat';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -118,10 +118,10 @@ const Navigation = () => {
 
 export default function App() {
   return (
-    <Provider store={store}>
+    <RootContext>
       <NavigationContainer>
         <Navigation />
       </NavigationContainer>
-    </Provider>
+    </RootContext>
   );
 }
