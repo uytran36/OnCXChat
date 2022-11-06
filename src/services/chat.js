@@ -7,3 +7,10 @@ export const requestGetRoomsInfo = (headers, params) => {
     params,
   });
 };
+
+export const requestAcceptRoom = (headers, params, data) => {
+  return axios.post(`${api.CHAT_SERVICE}/room/approved`, data, {
+    headers,
+    params,
+  }); 
+};

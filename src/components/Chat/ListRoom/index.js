@@ -1,16 +1,18 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
-import { VirtualizedList } from 'react-native';
+import { Alert, VirtualizedList } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { chatConstants } from '../../../constants/chat';
 import { useHeaders } from '../../../contexts';
-import { requestGetRoomsInfo } from '../../../services/chat';
+import { requestAcceptRoom, requestGetRoomsInfo } from '../../../services/chat';
 import { saveLoadMore, saveState, setFilter } from '../../../store/chat';
-import Loading from '../../Loading';
 
+import Loading from '../../Loading';
 import Room from '../Room';
 
 const ListRoom = () => {
   const { filter, roomsInfo } = useSelector(state => state.chat);
+  const { currentUser } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const headers = useHeaders();
@@ -31,13 +33,57 @@ const ListRoom = () => {
         );
       }
     }
-  }, [filter, dispatch]);
+  }, [headers, filter, dispatch]);
 
   useLayoutEffect(() => {
     getRoomsInfo();
   }, [getRoomsInfo]);
 
-  const renderItem = useCallback(({ item }) => <Room info={item} />, []);
+  const handleAcceptRoom = useCallback(
+    async (roomId, roomName) => {
+      if (!roomId) {
+        return null;
+      }
+      const res = await requestAcceptRoom(
+        headers,
+        {
+          roomId,
+        },
+        {
+          username: currentUser.username,
+          id: headers['userId'],
+          avatar: `${chatConstants.AVATAR_AGENT_BASE_URL}/${currentUser.username}`,
+        },
+      );
+      if (res?.status === 200) {
+        Alert.alert(`Bạn đã nhận cuộc hội thoại của ${roomName}!`);
+        return null;
+      }
+      Alert.alert(`Bạn không thể nhận cuộc hội thoại của ${roomName}!`);
+      return null;
+    },
+    [headers],
+  );
+
+  const handleClickRoom = useCallback(
+    async (roomId, roomName) => {
+      if (filter?.status === 'RECEIVED') {
+        console.log(roomId, roomName);
+      }
+    },
+    [headers, filter],
+  );
+
+  const renderItem = useCallback(
+    ({ item }) => (
+      <Room
+        info={item}
+        onAcceptRoom={handleAcceptRoom}
+        onClickRoom={handleClickRoom}
+      />
+    ),
+    [],
+  );
 
   const keyExtractor = useCallback(item => item.id, []);
 
@@ -56,7 +102,7 @@ const ListRoom = () => {
         dispatch(saveLoadMore(res.data.response.roomsInfo));
       }
     }
-  }, [filter, roomsInfo, isLoadMore]);
+  }, [headers, filter, roomsInfo, isLoadMore]);
 
   if (isFetching) {
     return <Loading />;

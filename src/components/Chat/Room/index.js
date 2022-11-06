@@ -1,6 +1,6 @@
 import { Entypo } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +10,7 @@ import Avatar from '../Avatar';
 import PageAvatar from '../PageAvatar';
 import styles from './styles';
 
-const Room = ({ info }) => {
+const Room = ({ info, onAcceptRoom, onClickRoom }) => {
   const user = useSelector(state => state.user);
   const filter = useSelector(state => state.chat.filter);
 
@@ -58,7 +58,8 @@ const Room = ({ info }) => {
       style={({ pressed }) => [
         styles.room,
         pressed && Platform.OS === 'ios' && styles.roomPressed,
-      ]}>
+      ]}
+      onPress={() => onClickRoom(data.id, data.roomName)}>
       <View style={styles.avatarContainer}>
         <Avatar url={data?.url} type={data?.type} name={data?.roomName} />
       </View>
@@ -113,7 +114,7 @@ const Room = ({ info }) => {
           <View style={styles.buttonContainer}>
             {data?.forward?.status ? (
               <>
-                <Pressable
+                {/* <Pressable
                   android_ripple={{ color: '#cccccc' }}
                   style={pressed => [
                     styles.acceptForwardBtn,
@@ -128,7 +129,7 @@ const Room = ({ info }) => {
                     pressed && Platform.OS === 'ios' && styles.btnPressed,
                   ]}>
                   <Text style={styles.denyForwardText}>Từ chối</Text>
-                </Pressable>
+                </Pressable> */}
               </>
             ) : (
               <Pressable
@@ -136,7 +137,8 @@ const Room = ({ info }) => {
                 style={pressed => [
                   styles.acceptBtn,
                   pressed && Platform.OS === 'ios' && styles.btnPressed,
-                ]}>
+                ]}
+                onPress={() => onAcceptRoom(data.id, data.roomName)}>
                 <Text style={styles.acceptText}>Chấp nhận</Text>
               </Pressable>
             )}
@@ -149,10 +151,14 @@ const Room = ({ info }) => {
 
 Room.propTypes = {
   info: PropTypes.object,
+  onAcceptRoom: PropTypes.func,
+  onClickRoom: PropTypes.func,
 };
 
 Room.defaultProps = {
   info: {},
+  onAcceptRoom: () => null,
+  onClickRoom: () => null,
 };
 
 export default memo(Room);

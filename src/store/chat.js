@@ -108,15 +108,15 @@ const chatSlice = createSlice({
             return;
           }
           const newListRoom = listRoom.filter(room => room.id !== roomInfo.id);
-          const { resolve } = action.payload;
-          resolve(newListRoom.length < listRoom.length);
+          const { resolve } = act.payload;
+          resolve?.(newListRoom.length < listRoom.length);
           state.roomsInfo.rooms = newListRoom;
           break;
         }
         default: {
-          state.roomsInfo.rooms = listRoom.concat(action.payload.listRoom);
-          state.roomsInfo.waiting = action.payload.waiting;
-          state.roomsInfo.processing = action.payload.processing;
+          state.roomsInfo.rooms = listRoom.concat(act.payload.listRoom);
+          state.roomsInfo.waiting = act.payload.waiting;
+          state.roomsInfo.processing = act.payload.processing;
           break;
         }
       }
