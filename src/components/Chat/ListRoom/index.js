@@ -1,10 +1,15 @@
+import { useNavigation } from '@react-navigation/native';
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { Alert, VirtualizedList } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { chatConstants } from '../../../constants/chat';
 import { useHeaders } from '../../../contexts';
-import { requestAcceptRoom, requestGetRoomsInfo } from '../../../services/chat';
+import {
+  requestAcceptRoom,
+  requestGetRoomsInfo,
+  requestReadMessage,
+} from '../../../services/chat';
 import { saveLoadMore, saveState, setFilter } from '../../../store/chat';
 
 import Loading from '../../Loading';
@@ -14,6 +19,8 @@ const ListRoom = () => {
   const { filter, roomsInfo } = useSelector(state => state.chat);
   const { currentUser } = useSelector(state => state.user);
   const dispatch = useDispatch();
+
+  const navigation = useNavigation();
 
   const headers = useHeaders();
 
@@ -56,7 +63,7 @@ const ListRoom = () => {
         },
       );
       if (res?.status === 200) {
-        Alert.alert(`Bạn đã nhận cuộc hội thoại của ${roomName}!`);
+        // Alert.alert(`Bạn đã nhận cuộc hội thoại của ${roomName}!`);
         return null;
       }
       Alert.alert(`Bạn không thể nhận cuộc hội thoại của ${roomName}!`);
@@ -65,13 +72,23 @@ const ListRoom = () => {
     [headers],
   );
 
-  const handleClickRoom = useCallback(
-    async (roomId, roomName) => {
-      if (filter?.status === 'RECEIVED') {
-        console.log(roomId, roomName);
-      }
+  const readMessage = useCallback(
+    async roomId => {
+      if (!roomId) return;
+      const res = await requestReadMessage(headers, { roomId });
+      console.log(res);
     },
-    [headers, filter],
+    [headers],
+  );
+
+  const handleClickRoom = useCallback(
+    async (roomId, roomName, isUnread, agent) => {
+      if (isUnread && agent?.id === currentUser?.id) {
+        // readMessage(roomId);
+      }
+      navigation.navigate('DetailChat', { roomId, roomName });
+    },
+    [],
   );
 
   const renderItem = useCallback(
@@ -94,7 +111,7 @@ const ListRoom = () => {
   const handleLoadMore = useCallback(async () => {
     if (!isLoadMore && roomsInfo.next) {
       const newFilter = { ...filter, page: filter.page + 1 };
-      dispatch(setFilter(newFilter));
+      dispatch(setFilter({ page: filter.page + 1 }));
       setIsLoadMore(true);
       const res = await requestGetRoomsInfo(headers, newFilter);
       setIsLoadMore(false);

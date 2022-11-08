@@ -37,10 +37,6 @@ const chatSlice = createSlice({
         action.payload.rooms,
       );
     },
-    reset: state => {
-      state.filter.page = 0;
-      state.roomsInfo = {};
-    },
     updateTab: (state, action) => {
       const { waiting, processing } = action.payload;
       const stateWating = parseInt(state?.roomsInfo?.waiting ?? 0, 10);
@@ -140,7 +136,6 @@ const chatSlice = createSlice({
 export const setFilter = chatSlice.actions.setFilter;
 export const saveState = chatSlice.actions.saveState;
 export const saveLoadMore = chatSlice.actions.saveLoadMore;
-export const reset = chatSlice.actions.reset;
 export const updateTab = chatSlice.actions.updateTab;
 export const mutationListRoom = chatSlice.actions.mutationListRoom;
 export const updateRoomInfoStateByRoomId =

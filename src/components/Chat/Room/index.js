@@ -1,14 +1,14 @@
 import { Entypo } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { capitalizeFirstLetter, convertTimeToDate } from '../../../utils';
+import styles from './styles';
 
 import Avatar from '../Avatar';
 import PageAvatar from '../PageAvatar';
-import styles from './styles';
 
 const Room = ({ info, onAcceptRoom, onClickRoom }) => {
   const user = useSelector(state => state.user);
@@ -52,6 +52,17 @@ const Room = ({ info, onAcceptRoom, onClickRoom }) => {
     };
   }, [info, user]);
 
+  const handlePress = () => {
+    if (filter?.status === 'RECEIVED') {
+      onClickRoom(
+        data.id,
+        data.roomName,
+        !!data.messageNumberUnread,
+        data.agent,
+      );
+    }
+  };
+
   return (
     <Pressable
       android_ripple={{ color: '#cccccc' }}
@@ -59,7 +70,7 @@ const Room = ({ info, onAcceptRoom, onClickRoom }) => {
         styles.room,
         pressed && Platform.OS === 'ios' && styles.roomPressed,
       ]}
-      onPress={() => onClickRoom(data.id, data.roomName)}>
+      onPress={handlePress}>
       <View style={styles.avatarContainer}>
         <Avatar url={data?.url} type={data?.type} name={data?.roomName} />
       </View>

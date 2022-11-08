@@ -1,9 +1,10 @@
 import { useCallback, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import {
   mutationListRoom,
-  updateRoomInfoStateByRoomId, updateTab
+  updateRoomInfoStateByRoomId,
+  updateTab,
 } from '../store/chat';
 
 const ACTIONS = {
@@ -24,9 +25,7 @@ const ACTIONS = {
   RE_OPEN_ROOM: 'RE_OPEN_ROOM',
 };
 
-export function useCountTab() {
-  const { filter } = useSelector(state => state.chat);
-  const { currentUser } = useSelector(state => state.user);
+export function useCountTab(filter, currentUser) {
   const dispatch = useDispatch();
 
   const WAITING = useMemo(() => filter.status === 'WAITING', [filter.status]);

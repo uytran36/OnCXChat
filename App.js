@@ -5,10 +5,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import * as encoding from 'text-encoding'; // don't remove this line
+
 import RootContext from './src/contexts';
-import { reset, setFilter } from './src/store/chat';
+import { setFilter } from './src/store/chat';
 
 import ChatScreen from './src/screens/ChatScreen';
+import DetailChatScreen from './src/screens/DetailChatSreen';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -48,16 +50,17 @@ const BottomNavigation = () => {
 
   return (
     <Tab.Navigator
+      screenOptions={{
+        unmountOnBlur: true,
+      }}
       screenListeners={{
-        blur: () => {
-          dispatch(reset());
-        },
         state: e => {
           const { index, routeNames } = e?.data?.state;
           dispatch(
             setFilter({
               status: routeNames[index],
               filter: routeNames[index] === 'WAITING' ? 'ALL' : 'PROCESSING',
+              page: 0,
             }),
           );
         },
@@ -112,6 +115,7 @@ const Navigation = () => {
         options={{ headerShown: false }}
         component={BottomNavigation}
       />
+      <Stack.Screen name="DetailChat" component={DetailChatScreen} />
     </Stack.Navigator>
   );
 };
