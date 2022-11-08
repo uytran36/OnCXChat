@@ -99,11 +99,11 @@ const BottomNavigation = () => {
 };
 
 const Navigation = () => {
-  // const isLogin = useSelector(state => state?.user?.isLogin ?? false);
+  const isLogin = useSelector(state => state?.user?.isLogin ?? false);
 
-  // if (!isLogin) {
-  //   return <LoginScreen />;
-  // }
+  if (!isLogin) {
+    return <LoginScreen />;
+  }
 
   return (
     <Stack.Navigator>
