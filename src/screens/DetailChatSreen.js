@@ -10,8 +10,7 @@ const DetailChatScreen = ({ route, navigation }) => {
     });
   }, []);
 
-  return <DetailChat />;
+  return <DetailChat roomId={roomId} />;
 };
 
 export default DetailChatScreen;
-

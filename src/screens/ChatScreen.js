@@ -18,7 +18,6 @@ const ChatScreen = () => {
   const handleWatchListRoom = useCallback(
     event => {
       const { eventType, room, triggerBy, to } = event;
-      console.log(eventType);
       switch (eventType) {
         case 'NEW_ROOM': {
           countTab('NEW_ROOM', {

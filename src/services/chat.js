@@ -29,7 +29,7 @@ export const requestGetRoomInfo = (headers, params) => {
 };
 
 export const requestGetRoomMessages = (headers, params) => {
-  return axios.get(`${api.CHAT_SERVICE}/room/message`, {
+  return axios.get(`${api.CHAT_SERVICE}/message`, {
     headers,
     params,
   });
