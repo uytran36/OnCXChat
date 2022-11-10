@@ -12,9 +12,11 @@ const userSlice = createSlice({
       state.isLogin = !!(action?.payload ?? 0);
     },
     saveState: (state, action) => {
-      state = { ...state, ...(action?.payload ?? {}) };
+      return { ...state, ...(action?.payload ?? {}) };
     },
   },
 });
+
+export const saveState = userSlice.actions.saveState;
 
 export default userSlice.reducer;

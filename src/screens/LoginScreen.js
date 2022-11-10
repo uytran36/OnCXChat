@@ -1,20 +1,43 @@
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, Alert } from 'react-native';
 import background from '../../assets/background.png';
 import { Card, InputItem, Button } from '@ant-design/react-native';
 import { useState } from 'react';
 import { requestLogin } from '../services/login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { saveState } from '../../src/store/user';
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
 
   const handleClickLogin = async () => {
-    const res = await requestLogin({ username, password });
     try {
+      const res = await requestLogin({ username, password });
+
       if (res.status === 200) {
-        console.log(res);
+        const storeData = async value => {
+          try {
+            await AsyncStorage.setItem('@accessToken', value);
+          } catch (e) {
+            // saving error
+          }
+        };
+
+        storeData(res?.data?.tokenGateway);
+        dispatch(
+          saveState({
+            isLogin: true,
+            token: res?.data?.tokenGateway,
+            currentUser: res?.data?.user?.data,
+          }),
+        );
       }
     } catch (err) {
+      Alert.alert('Lỗi', 'Đăng nhập không thành công', [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
       console.log(err);
     }
   };
