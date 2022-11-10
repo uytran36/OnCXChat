@@ -1,14 +1,16 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import moment from 'moment';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import * as encoding from 'text-encoding'; // don't remove this line
+
+import RootContext from './src/contexts';
+import { setFilter } from './src/store/chat';
 
 import ChatScreen from './src/screens/ChatScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import { store } from './src/store';
-import { setFilter, reset } from './src/store/chat';
+import DetailChatScreen from './src/screens/DetailChatSreen';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -48,16 +50,17 @@ const BottomNavigation = () => {
 
   return (
     <Tab.Navigator
+      screenOptions={{
+        unmountOnBlur: true,
+      }}
       screenListeners={{
-        blur: () => {
-          dispatch(reset());
-        },
         state: e => {
           const { index, routeNames } = e?.data?.state;
           dispatch(
             setFilter({
               status: routeNames[index],
               filter: routeNames[index] === 'WAITING' ? 'ALL' : 'PROCESSING',
+              page: 0,
             }),
           );
         },
@@ -112,16 +115,17 @@ const Navigation = () => {
         options={{ headerShown: false }}
         component={BottomNavigation}
       />
+      <Stack.Screen name="DetailChat" component={DetailChatScreen} />
     </Stack.Navigator>
   );
 };
 
 export default function App() {
   return (
-    <Provider store={store}>
+    <RootContext>
       <NavigationContainer>
         <Navigation />
       </NavigationContainer>
-    </Provider>
+    </RootContext>
   );
 }

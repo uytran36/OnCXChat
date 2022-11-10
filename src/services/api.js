@@ -1,4 +1,5 @@
+import { API_BASE_URL } from '@env';
+
 export default api = {
-  CHAT_SERVICE: 'https://oncx-gateway.fptdata.com/api/smcc-chat-service',
-  USER_SERVICE: 'https://oncx-gateway.fptdata.com/api/auth',
+  CHAT_SERVICE: `${API_BASE_URL}/api/smcc-chat-service`,
 };

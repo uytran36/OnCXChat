@@ -1,13 +1,36 @@
 import axios from 'axios';
 import api from './api';
 
-export const requestGetRoomsInfo = params => {
+export const requestGetRoomsInfo = (headers, params) => {
   return axios.get(`${api.CHAT_SERVICE}/room`, {
-    headers: {
-      authorization:
-        'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGhvcml0aWVzIjpbImFkbWluIl0sInNlc3Npb25JZCI6IjlhMWJkYTBkLTQyYTctNGViMS1iN2ZiLThlZGY4OTIyOGUyMiIsImlhdCI6MTY2NzExODA1NywiZXhwIjoxNjY3MjA0NDU3fQ.lb3lXIrZPPDPBOOWFGsBmsyyfZt-Z7nNhvKJifBz_eACjJvF0dN_Eej1APAAUcIq5_kO9elhTF2xW293B1uZ1g',
-      userId: '6131c12466eaf19ca7a2daff',
-    },
+    headers,
+    params,
+  });
+};
+
+export const requestAcceptRoom = (headers, params, data) => {
+  return axios.post(`${api.CHAT_SERVICE}/room/approved`, data, {
+    headers,
+    params,
+  });
+};
+
+export const requestReadMessage = (headers, params) => {
+  return axios.post(`${api.CHAT_SERVICE}/room/read-message`, {
+    headers,
+    params,
+  });
+};
+
+export const requestGetRoomInfo = (headers, params) => {
+  return axios.get(`${api.CHAT_SERVICE}/room/details/${params?.roomId}`, {
+    headers,
+  });
+};
+
+export const requestGetRoomMessages = (headers, params) => {
+  return axios.get(`${api.CHAT_SERVICE}/room/message`, {
+    headers,
     params,
   });
 };
