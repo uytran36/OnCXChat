@@ -1,3 +1,4 @@
+import { Entypo } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -7,6 +8,8 @@ import { logAction } from '../../../constants/chat';
 import { diffTimeInMinutes, formatDate } from '../../../utils';
 
 import MessageAvatar from '../MessageAvatar';
+import MessageBubble from '../MessageBubble';
+import MessageText from '../MessageText';
 
 const Message = ({ messageInfo }) => {
   const { message, index, listMessage } = messageInfo;
@@ -67,7 +70,7 @@ const Message = ({ messageInfo }) => {
       mid: message?.mid,
       senderId: message?.senderId,
       senderName: message?.senderName,
-      avatar: roomInfo?.avatarURL ?? 'livechat',
+      avatar: roomInfo?.customFields?.dataInfoDto?.profilePic ?? 'livechat',
       checkpoint,
       showAvatar,
       ts: message?.timestamp,
@@ -135,7 +138,113 @@ const Message = ({ messageInfo }) => {
     );
   };
 
-  const renderContent = () => {};
+  const renderContent = () => [
+    data?.msg &&
+      (data?.messageReply ? (
+        <View key={data?.mid}>
+          {data?.messageReply?.attachments &&
+          data?.messageReply?.attachments.length > 0 &&
+          (data?.messageReply?.attachments[0]?.type === 'image' ||
+            data?.messageReply?.attachments[0]?.type === 'gif' ||
+            data?.messageReply?.attachments[0]?.type === 'sticker') ? (
+            // Reply ảnh bằng text
+            // <MessageBubble
+            //   reply={true}
+            //   position={position}
+            //   isImage
+            //   nude
+            //   ts={ts}
+            //   inverse={me}
+            //   quoted={quoted}
+            //   other={!customer && !me}>
+            //   <GridImages
+            //     mid={mid}
+            //     images={messageReply?.attachments}
+            //     onLoad={onLoadAttachment}
+            //     scrollIntoReply={() => handleScrollToReply(messageReply?.mid)}
+            //   />
+            // </MessageBubble>
+            <Text>Chưa làm ={')))'}</Text>
+          ) : (
+            // Reply text bằng text
+            <MessageBubble
+              // ts={ts}
+              reply={true}
+              replyCustomer={data?.customer}
+              inverse={data?.me}
+              quoted={data?.quoted}
+              other={!data?.customer && !data?.me}
+              position={data?.position}
+              style={{
+                backgroundColor: '#fff',
+              }}
+              // onClick={() => handleScrollToReply(messageReply?.mid)}
+            >
+              <MessageText
+                reply={true}
+                text={data?.messageReply?.text || 'Tệp đính kèm'}
+                customer={data?.customer}
+                system={data?.system}
+                inverse={data?.me}
+                other={!data?.customer && !data?.me}
+                style={{ opacity: 0.45, color: '#000', fontSize: 12 }}
+              />
+            </MessageBubble>
+          )}
+          <View>
+            <MessageBubble
+              ts={data?.ts}
+              inverse={data?.me}
+              quoted={data?.quoted}
+              other={!data?.customer && !data?.me}
+              position={data?.position}
+              style={{ marginTop: -8 }}>
+              <MessageText
+                mid={data?.mid}
+                customer={data?.customer}
+                text={data?.msg}
+                system={data?.system}
+                inverse={data?.me}
+                other={!data?.customer && !data?.me}
+              />
+            </MessageBubble>
+            {/* {(roomInfo?.type === 'LIVECHAT' || roomInfo?.type === 'ZALO') && (
+              <div
+                className={classNames(styles['reply-message-icon'], {
+                  [styles['reply-message-icon__reverse']]: !me,
+                })}
+                hidden={hideReply}>
+                <Tooltip title="Trả lời">
+                  <Button
+                    id={`reply-button-${mid}`}
+                    className={styles['reply-button']}
+                    icon={<Icon component={IconReply} />}
+                    onClick={handleClickReply}
+                  />
+                </Tooltip>
+              </div>
+            )} */}
+          </View>
+        </View>
+      ) : (
+        <MessageBubble
+          key={data?.mid}
+          ts={data?.ts}
+          inverse={data?.me}
+          quoted={data?.quoted}
+          other={!data?.customer && !data?.me}
+          position={data?.position}>
+          <MessageText
+            mid={data?.mid}
+            customer={data?.customer}
+            text={data?.msg}
+            system={data?.system}
+            inverse={data?.me}
+            other={!data?.customer && !data?.me}
+          />
+        </MessageBubble>
+      )),
+  ];
 
   return (
     <View style={styles.container}>
@@ -147,7 +256,39 @@ const Message = ({ messageInfo }) => {
         !data?.me && (
           <Text style={styles.adminSender}>{data?.senderName ?? ''}</Text>
         )}
-      <View style={styles.messageContainer}>
+      {data?.messageReply && data?.msg && (
+        <View
+          style={[
+            styles.replyHeader,
+            data?.me && styles.replyHeaderReverse,
+            !data?.me && { marginLeft: 40 },
+          ]}>
+          <View style={styles.replyInner}>
+            <Entypo
+              name="forward"
+              size={16}
+              color="#282525"
+              style={styles.replyIcon}
+            />
+            <Text>{` ${data?.me ? 'Bạn' : senderName} đã trả lời `}</Text>
+            <Text style={styles.replyName}>
+              {data?.me &&
+              data?.messageReply?.senderName === currentUser?.username
+                ? 'Chính mình'
+                : !data?.me &&
+                  data?.messageReply?.senderName === currentUser?.username
+                ? 'Bạn'
+                : data?.messageReply?.senderName}
+            </Text>
+          </View>
+        </View>
+      )}
+      <View
+        style={[
+          styles.messageContainer,
+          !data?.me && styles.messageContainerReverse,
+          !data?.me && !data?.showAvatar && { marginLeft: 40 },
+        ]}>
         {data?.showAvatar && !data?.me && data?.customer && (
           <MessageAvatar avatar={data?.avatar} roomName={data?.roomName} />
         )}
@@ -211,5 +352,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     marginLeft: 40,
+  },
+  replyHeader: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  replyHeaderReverse: {
+    flexDirection: 'row-reverse',
+  },
+  replyInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  replyIcon: {
+    transform: [{ rotateY: '180deg' }],
+  },
+  replyName: { fontWeight: 'bold' },
+  messageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  messageContainerReverse: {
+    justifyContent: 'flex-start',
+  },
+  messageContent: {
+    marginLeft: 5,
+    maxWidth: '75%',
   },
 });

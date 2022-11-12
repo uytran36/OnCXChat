@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert } from 'react-native';
-import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 
 import { requestGetRoomMessages } from '../../../services/chat';
 
@@ -38,6 +38,7 @@ const sendMessageWithAttachments = async (headers, data) => {
 export const useQueryMessages = (headers, { roomId, limit = 30 }) => {
   const {
     isFetching: isLoadingListMessage,
+    isFetchingNextPage,
     data: dataMessages,
     fetchNextPage: onNextPageListMessage,
     hasNextPage,
@@ -59,7 +60,7 @@ export const useQueryMessages = (headers, { roomId, limit = 30 }) => {
         const result = data.pages.reduce((r, page) => {
           let clone = r;
           if (page.messages.length > 0) {
-            clone = [...page.messages, ...clone];
+            clone = [...clone, ...page.messages];
           }
           return clone;
         }, []);
@@ -86,6 +87,7 @@ export const useQueryMessages = (headers, { roomId, limit = 30 }) => {
 
   return {
     loading: isLoadingListMessage,
+    isFetchingNextPage,
     hasNextPage,
     listMessage: dataMessages?.data || [],
     onNextPageListMessage,

@@ -3,15 +3,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { VirtualizedList } from 'react-native';
 
 import { useHeaders } from '../../../contexts';
-import Loading from '../../Loading';
 import { useQueryMessages } from '../Hooks/useChat';
 
+import Loading from '../../Loading';
 import Message from '../Message';
 
 const Messages = ({ roomId }) => {
   const headers = useHeaders();
 
-  const [isLoadMore, setIsLoadMore] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -24,9 +23,9 @@ const Messages = ({ roomId }) => {
   const {
     listMessage,
     onNextPageListMessage,
-    onRefreshListMessage,
     hasNextPage,
     loading: isLoadingListMessage,
+    isFetchingNextPage: isLoadMore,
   } = useQueryMessages(headers, {
     roomId,
   });
@@ -50,10 +49,11 @@ const Messages = ({ roomId }) => {
 
   const handleLoadMore = useCallback(async () => {
     if (isMounted && !isLoadMore && hasNextPage) {
+      await onNextPageListMessage();
     }
-  }, [isLoadMore, isMounted, hasNextPage]);
+  }, [isLoadMore, isMounted, hasNextPage, onNextPageListMessage]);
 
-  if (isLoadingListMessage) {
+  if (!isLoadMore && isLoadingListMessage) {
     return <Loading />;
   }
 
