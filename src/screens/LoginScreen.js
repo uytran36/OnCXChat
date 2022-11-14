@@ -21,7 +21,7 @@ const LoginScreen = () => {
           try {
             await AsyncStorage.setItem('@accessToken', value);
           } catch (e) {
-            // saving error
+            console.log(e);
           }
         };
 
@@ -29,16 +29,17 @@ const LoginScreen = () => {
         dispatch(
           saveState({
             isLogin: true,
-            token: res?.data?.tokenGateway,
-            currentUser: res?.data?.user?.data,
+            tokenGateway: `Bearer ${res?.data?.tokenGateway}`,
+            currentUser: res?.data?.user?.data?.me,
+            userId: res?.data?.user?.data?.userId,
           }),
         );
       }
     } catch (err) {
+      console.log(err);
       Alert.alert('Lỗi', 'Đăng nhập không thành công', [
         { text: 'OK', onPress: () => console.log('OK Pressed') },
       ]);
-      console.log(err);
     }
   };
 

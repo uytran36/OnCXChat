@@ -5,12 +5,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import * as encoding from 'text-encoding'; // don't remove this line
+import { saveState } from './src/store/user';
 
 import RootContext from './src/contexts';
 import { setFilter } from './src/store/chat';
-
+import LoginScreen from './src/screens/LoginScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
+import { Button } from '@ant-design/react-native';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -52,6 +54,22 @@ const BottomNavigation = () => {
     <Tab.Navigator
       screenOptions={{
         unmountOnBlur: true,
+        headerRight: () => (
+          <Button
+            onPress={() => {
+              dispatch(
+                saveState({
+                  isLogin: false,
+                  tokenGateway: '',
+                  currentUser: '',
+                  userId: '',
+                }),
+              );
+            }}
+            style={{ marginRight: 10 }}>
+            Đăng xuất
+          </Button>
+        ),
       }}
       screenListeners={{
         state: e => {
@@ -70,6 +88,7 @@ const BottomNavigation = () => {
         options={{
           title: 'Đang chờ',
           tabBarLabel: 'Đang chờ',
+
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="message-text-clock-outline"
