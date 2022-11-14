@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, VirtualizedList } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -26,9 +26,17 @@ const ListRoom = () => {
 
   const [isFetching, setIsFetching] = useState(false);
   const [isLoadMore, setIsLoadMore] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
 
   const getRoomsInfo = useCallback(async () => {
-    if (!filter.page) {
+    if (isMounted && !filter.page) {
       setIsFetching(true);
       const res = await requestGetRoomsInfo(headers, filter);
       setIsFetching(false);
@@ -40,7 +48,7 @@ const ListRoom = () => {
         );
       }
     }
-  }, [headers, filter, dispatch]);
+  }, [isMounted, headers, filter, dispatch]);
 
   useLayoutEffect(() => {
     getRoomsInfo();
@@ -109,7 +117,7 @@ const ListRoom = () => {
   const getItemCount = useCallback(data => data?.length ?? 0, []);
 
   const handleLoadMore = useCallback(async () => {
-    if (!isLoadMore && roomsInfo.next) {
+    if (isMounted && !isLoadMore && roomsInfo.next) {
       const newFilter = { ...filter, page: filter.page + 1 };
       dispatch(setFilter({ page: filter.page + 1 }));
       setIsLoadMore(true);
@@ -119,7 +127,7 @@ const ListRoom = () => {
         dispatch(saveLoadMore(res.data.response.roomsInfo));
       }
     }
-  }, [headers, filter, roomsInfo, isLoadMore]);
+  }, [headers, filter, roomsInfo, isLoadMore, isMounted]);
 
   if (isFetching) {
     return <Loading />;
@@ -133,7 +141,7 @@ const ListRoom = () => {
       getItemCount={getItemCount}
       getItem={getItem}
       onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={0.2}
     />
   );
 };
