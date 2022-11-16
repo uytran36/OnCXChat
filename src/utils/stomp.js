@@ -166,6 +166,16 @@ export class SetupSocket {
       }
     }
   }
+
+  onWatchLogAction(callback, { roomId }) {
+    if (this?.StompClient?.connected && roomId) {
+      const subscription = this.StompClient.subscribe(
+        `/topic/log-room/${roomId}`,
+        this.#handleParseJson(callback),
+      );
+      return subscription;
+    }
+  }
 }
 
 export const NewSetupSocket = new SetupSocket();

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import DetailChat from '../components/DetailChat';
 
 const DetailChatScreen = ({ route, navigation }) => {

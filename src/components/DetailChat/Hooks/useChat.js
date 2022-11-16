@@ -1,8 +1,10 @@
 import React from 'react';
-import { Alert } from 'react-native';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 
-import { requestGetRoomMessages } from '../../../services/chat';
+import {
+  requestGetRoomMessages,
+  requestSendMessageWithAttachments
+} from '../../../services/chat';
 
 const fetchListMessage = async (headers, params) => {
   try {
@@ -25,12 +27,12 @@ const fetchListMessage = async (headers, params) => {
 const sendMessageWithAttachments = async (headers, data) => {
   try {
     const res = await requestSendMessageWithAttachments(headers, data);
-    if (res?.code === 200) {
+    if (res?.status === 200) {
       return true;
     }
-    throw new Error(res.errorMsg || 'ERROR');
+    throw new Error(res.data.errorMsg || 'ERROR');
   } catch (err) {
-    Alert(err.toString());
+    console.log(err.toString());
     return false;
   }
 };

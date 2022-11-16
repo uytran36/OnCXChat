@@ -6,7 +6,7 @@ const userSlice = createSlice({
     isLogin: false,
     userId: '62fcbbb75a2233315585ff17',
     tokenGateway:
-      'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsb2NudHgiLCJhdXRob3JpdGllcyI6WyJnYUxqRnoiXSwic2Vzc2lvbklkIjoiMjFiNmYxMGYtMzk2Ny00YmVlLWJhZjctYzAzMDVjYjE0NTcyIiwiaWF0IjoxNjY4MjM4MjgxLCJleHAiOjE2NjgzMjQ2ODF9.xFTkRS0VxKzLCaxBOUxKQHzbq1IcyAdLOJpNlM0Sm9xomApl2cRM33_iZsEUM7D-lxBqShdAlMbzHOuDV8F5PA',
+      'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsb2NudHgiLCJhdXRob3JpdGllcyI6WyJnYUxqRnoiXSwic2Vzc2lvbklkIjoiMTAzZTdiMGMtNWUxZC00NWMzLWI4NTEtNjgyODg5YjM2YjExIiwiaWF0IjoxNjY4NjA1NzU2LCJleHAiOjE2Njg2OTIxNTZ9.ji5GSVnLl48MthbCuEjbqZU4a8Ihgec7vWlGyQ4DqJpwcfi_Xbp7nuAj00R_l1A0AUijT4peviRfVym_wkffJQ',
     currentUser: {
       id: '62fcbbb75a2233315585ff17',
       username: 'locntx',
