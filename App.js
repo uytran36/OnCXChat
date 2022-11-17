@@ -13,8 +13,6 @@ import { setFilter } from './src/store/chat';
 import LoginScreen from './src/screens/LoginScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
-import { Button } from '@ant-design/react-native';
-import { Pressable, Text } from 'react-native';
 import CustomHeader from './src/components/Header';
 
 moment.updateLocale('vi', {

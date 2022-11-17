@@ -2,6 +2,8 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 import { saveState } from '../../../src/store/user';
+import { Button } from '@ant-design/react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const Header = props => {
   const dispatch = useDispatch();
@@ -27,14 +29,22 @@ const Header = props => {
           />
         </Pressable>
       </View>
-      <View style={styles.searchWrapper}>
-        <AntDesign
-          style={{ marginTop: 'auto', marginBottom: 'auto', marginLeft: 8 }}
-          name="search1"
-          size={18}
-          color="black"
-        />
-        <TextInput style={styles.input} placeholder="Tìm tên, số điện thoại" />
+      <View style={styles.searchAndFilter}>
+        <View style={styles.searchWrapper}>
+          <AntDesign
+            style={{ marginTop: 'auto', marginBottom: 'auto', marginLeft: 8 }}
+            name="search1"
+            size={18}
+            color="black"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Tìm tên, số điện thoại"
+          />
+        </View>
+        <Button style={styles.button}>
+          <Ionicons name="filter-outline" size={24} color="black" />
+        </Button>
       </View>
     </View>
   );
@@ -61,9 +71,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 5,
     backgroundColor: '#fff',
-    width: '90%',
+    width: '80%',
+  },
+  searchAndFilter: {
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 16,
   },
   input: {
     paddingLeft: 8,
+    paddingTop: 4,
+    paddingBottom: 4,
+  },
+  button: {
+    marginLeft: 8, 
+    marginTop: 16,
+    height: 36,
   },
 });
