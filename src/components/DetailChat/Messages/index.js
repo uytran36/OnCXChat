@@ -5,7 +5,7 @@ import { VirtualizedList } from 'react-native';
 import { useHeaders } from '../../../contexts';
 import { useQueryMessages } from '../Hooks/useChat';
 
-import Loading from '../../Loading';
+import LoadingOverlay from '../../LoadingOverlay';
 import Message from '../Message';
 
 const Messages = ({ roomId }) => {
@@ -13,22 +13,24 @@ const Messages = ({ roomId }) => {
 
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-    return () => {
-      setIsMounted(false);
-    };
-  }, []);
-
   const {
     listMessage,
     onNextPageListMessage,
     hasNextPage,
-    loading: isLoadingListMessage,
     isFetchingNextPage: isLoadMore,
   } = useQueryMessages(headers, {
     roomId,
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 500);
+    return () => {
+      timer && clearTimeout(timer);
+      setIsMounted(false);
+    };
+  }, []);
 
   const renderItem = useCallback(
     ({ item }) => <Message messageInfo={item} />,
@@ -53,21 +55,20 @@ const Messages = ({ roomId }) => {
     }
   }, [isLoadMore, isMounted, hasNextPage, onNextPageListMessage]);
 
-  if (!isLoadMore && isLoadingListMessage) {
-    return <Loading />;
-  }
-
   return (
-    <VirtualizedList
-      inverted
-      data={listMessage ?? []}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      getItemCount={getItemCount}
-      getItem={getItem}
-      onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.2}
-    />
+    <>
+      {!isMounted && <LoadingOverlay />}
+      <VirtualizedList
+        inverted
+        data={listMessage ?? []}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        getItemCount={getItemCount}
+        getItem={getItem}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.2}
+      />
+    </>
   );
 };
 

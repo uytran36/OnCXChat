@@ -130,6 +130,24 @@ const chatSlice = createSlice({
         state.roomInfo = roomModel || {};
       }
     },
+    updateUserCareRooms: (state, action) => {
+      const { avatarUrl, userId } = action.payload;
+      const { userCareRooms } = state.roomInfo;
+      const newUserCareRooms = [...userCareRooms];
+      const agent = {
+        avatarUrl,
+        id: userId,
+      };
+      const oldAgent = newUserCareRooms.find(item => item.id === userId);
+      if (!oldAgent) {
+        newUserCareRooms.push(agent);
+      } else if (oldAgent?.avatarUrl !== avatarUrl) {
+        oldAgent.avatarUrl = avatarUrl;
+      }
+      if (JSON.stringify(userCareRooms) !== JSON.stringify(newUserCareRooms)) {
+        state.roomInfo.userCareRooms = newUserCareRooms;
+      }
+    },
   },
 });
 
@@ -140,5 +158,6 @@ export const updateTab = chatSlice.actions.updateTab;
 export const mutationListRoom = chatSlice.actions.mutationListRoom;
 export const updateRoomInfoStateByRoomId =
   chatSlice.actions.updateRoomInfoStateByRoomId;
+export const updateUserCareRooms = chatSlice.actions.updateUserCareRooms;
 
 export default chatSlice.reducer;

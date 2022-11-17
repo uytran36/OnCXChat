@@ -34,3 +34,9 @@ export const requestGetRoomMessages = (headers, params) => {
     params,
   });
 };
+
+export const requestSendMessageWithAttachments = (headers, data) => {
+  return axios.post(`${api.CHAT_SERVICE}/message/send-message`, data, {
+    headers: { ...headers, 'Content-Type': 'multipart/form-data' },
+  });
+};
