@@ -10,17 +10,19 @@ import { NewSetupSocket } from '../utils/stomp';
 const WebsocketContext = createContext(null);
 
 function useSetupWebsocket(currentUser, token, wsId) {
+  const { isLogin } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    NewSetupSocket.onConnect({
-      dispatch,
-      wsId,
-      userId: currentUser?.id,
-      agentUuid: currentUser?.extension?.agentUuid || '',
-      username: currentUser?.username,
-      token,
-    });
+    isLogin &&
+      NewSetupSocket.onConnect({
+        dispatch,
+        wsId,
+        userId: currentUser?.id,
+        agentUuid: currentUser?.extension?.agentUuid || '',
+        username: currentUser?.username,
+        token,
+      });
     dispatch({
       type: 'user/saveState',
       payload: {
@@ -30,7 +32,7 @@ function useSetupWebsocket(currentUser, token, wsId) {
     return () => {
       NewSetupSocket.onDisconnect();
     };
-  }, [dispatch, token, wsId]);
+  }, [dispatch, token, wsId, isLogin]);
 
   return { ws: NewSetupSocket };
 }

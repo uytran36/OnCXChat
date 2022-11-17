@@ -2,15 +2,18 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AntDesign } from '@expo/vector-icons';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import * as encoding from 'text-encoding'; // don't remove this line
+import { saveState } from './src/store/user';
 
 import RootContext from './src/contexts';
 import { setFilter } from './src/store/chat';
-
+import LoginScreen from './src/screens/LoginScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
+import CustomHeader from './src/components/Header';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -52,6 +55,25 @@ const BottomNavigation = () => {
     <Tab.Navigator
       screenOptions={{
         unmountOnBlur: true,
+        header: props => <CustomHeader {...props} />,
+        // headerRight: () => (
+        //   <Pressable style={{ marginRight: 15 }}>
+        //     <AntDesign
+        //       name="logout"
+        //       size={24}
+        //       onPress={() => {
+        //         dispatch(
+        //           saveState({
+        //             isLogin: false,
+        //             tokenGateway: '',
+        //             currentUser: '',
+        //             userId: '',
+        //           }),
+        //         );
+        //       }}
+        //     />
+        //   </Pressable>
+        // ),
       }}
       screenListeners={{
         state: e => {
@@ -70,6 +92,7 @@ const BottomNavigation = () => {
         options={{
           title: 'Đang chờ',
           tabBarLabel: 'Đang chờ',
+
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="message-text-clock-outline"
@@ -102,11 +125,11 @@ const BottomNavigation = () => {
 };
 
 const Navigation = () => {
-  // const isLogin = useSelector(state => state?.user?.isLogin ?? false);
+  const isLogin = useSelector(state => state?.user?.isLogin ?? false);
 
-  // if (!isLogin) {
-  //   return <LoginScreen />;
-  // }
+  if (!isLogin) {
+    return <LoginScreen />;
+  }
 
   return (
     <Stack.Navigator>
