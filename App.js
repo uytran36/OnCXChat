@@ -7,6 +7,7 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import * as encoding from 'text-encoding'; // don't remove this line
 import { saveState } from './src/store/user';
+import { Drawer } from '@ant-design/react-native';
 
 import RootContext from './src/contexts';
 import { setFilter } from './src/store/chat';
@@ -14,6 +15,8 @@ import LoginScreen from './src/screens/LoginScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
 import CustomHeader from './src/components/Header';
+import { useRef } from 'react';
+import Sidebar from './src/components/Chat/Sidebar';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -50,77 +53,69 @@ const Stack = createNativeStackNavigator();
 const BottomNavigation = () => {
   const roomsInfo = useSelector(state => state.chat.roomsInfo);
   const dispatch = useDispatch();
+  const elRef = useRef(null);
 
   return (
-    <Tab.Navigator
-      screenOptions={{
-        unmountOnBlur: true,
-        header: props => <CustomHeader {...props} />,
-        // headerRight: () => (
-        //   <Pressable style={{ marginRight: 15 }}>
-        //     <AntDesign
-        //       name="logout"
-        //       size={24}
-        //       onPress={() => {
-        //         dispatch(
-        //           saveState({
-        //             isLogin: false,
-        //             tokenGateway: '',
-        //             currentUser: '',
-        //             userId: '',
-        //           }),
-        //         );
-        //       }}
-        //     />
-        //   </Pressable>
-        // ),
-      }}
-      screenListeners={{
-        state: e => {
-          const { index, routeNames } = e?.data?.state;
-          dispatch(
-            setFilter({
-              status: routeNames[index],
-              filter: routeNames[index] === 'WAITING' ? 'ALL' : 'PROCESSING',
-              page: 0,
-            }),
-          );
-        },
-      }}>
-      <Tab.Screen
-        name="WAITING"
-        options={{
-          title: 'Đang chờ',
-          tabBarLabel: 'Đang chờ',
+    <Drawer
+      sidebar={<Sidebar elRef={elRef} />}
+      open={false}
+      position="right"
+      drawerRef={el => (elRef.current = el)}
+      drawerBackgroundColor="#FFFFFF">
+      <Tab.Navigator
+        screenOptions={{
+          unmountOnBlur: true,
+          header: props => <CustomHeader elRef={elRef} {...props} />,
+        }}
+        screenListeners={{
+          state: e => {
+            const { index, routeNames } = e?.data?.state;
+            dispatch(
+              setFilter({
+                status: routeNames[index],
+                filter: routeNames[index] === 'WAITING' ? 'ALL' : 'PROCESSING',
+                page: 0,
+              }),
+            );
+          },
+        }}>
+        <Tab.Screen
+          name="WAITING"
+          options={{
+            title: 'Đang chờ',
+            tabBarLabel: 'Đang chờ',
 
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="message-text-clock-outline"
-              size={size}
-              color={color}
-            />
-          ),
-          ...(roomsInfo?.waiting && { tabBarBadge: roomsInfo?.waiting }),
-        }}
-        component={ChatScreen}
-      />
-      <Tab.Screen
-        name="RECEIVED"
-        options={{
-          title: 'Đã nhận',
-          tabBarLabel: 'Đã nhận',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="message-text-outline"
-              size={size}
-              color={color}
-            />
-          ),
-          ...(roomsInfo?.processing && { tabBarBadge: roomsInfo?.processing }),
-        }}
-        component={ChatScreen}
-      />
-    </Tab.Navigator>
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="message-text-clock-outline"
+                size={size}
+                color={color}
+              />
+            ),
+            ...(roomsInfo?.waiting && { tabBarBadge: roomsInfo?.waiting }),
+          }}
+          component={ChatScreen}
+        />
+        <Tab.Screen
+          name="RECEIVED"
+          options={{
+            title: 'Đã nhận',
+            tabBarLabel: 'Đã nhận',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="message-text-outline"
+                size={size}
+                color={color}
+              />
+            ),
+            ...(roomsInfo?.processing && {
+              tabBarBadge: roomsInfo?.processing,
+            }),
+          }}
+          component={ChatScreen}
+        />
+      </Tab.Navigator>
+    </Drawer>
   );
 };
 

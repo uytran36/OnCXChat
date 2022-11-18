@@ -3,11 +3,23 @@ import { AntDesign } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 import { saveState } from '../../../src/store/user';
 import { Button } from '@ant-design/react-native';
+import { setFilter } from '../../../src/store/chat';
 import { Ionicons } from '@expo/vector-icons';
 
 const Header = props => {
   const dispatch = useDispatch();
-  console.log({ props });
+
+  const handleSearch = text => {
+    dispatch(
+      setFilter({
+        q: text,
+      }),
+    );
+  };
+  const handleClickFilter = () => {
+    props.elRef.current.openDrawer();
+  };
+
   return (
     <View style={styles.headerWrapper}>
       <View style={styles.headerTitleWrapper}>
@@ -40,9 +52,10 @@ const Header = props => {
           <TextInput
             style={styles.input}
             placeholder="Tìm tên, số điện thoại"
+            onChangeText={text => handleSearch(text)}
           />
         </View>
-        <Button style={styles.button}>
+        <Button style={styles.button} onPress={handleClickFilter}>
           <Ionicons name="filter-outline" size={24} color="black" />
         </Button>
       </View>
@@ -84,7 +97,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   button: {
-    marginLeft: 8, 
+    marginLeft: 8,
     marginTop: 16,
     height: 36,
   },
