@@ -25,7 +25,7 @@ const ACTIONS = {
   RE_OPEN_ROOM: 'RE_OPEN_ROOM',
 };
 
-export function useCountTab(filter, currentUser) {
+export function useCountTab(filter, currentUser, allChat) {
   const dispatch = useDispatch();
 
   const WAITING = useMemo(() => filter.status === 'WAITING', [filter.status]);
@@ -127,7 +127,7 @@ export function useCountTab(filter, currentUser) {
               roomInfo.status === 'WAITING' ||
               (roomInfo.status === 'PROCESSING' &&
                 roomInfo?.forward?.status &&
-                roomInfo?.forward?.to === currentUser.username)
+                (roomInfo?.forward?.to === currentUser.username || allChat))
             )
               handleMutationListRoom('REPLACE_TO_FIRST', roomInfo);
             break;
@@ -138,7 +138,7 @@ export function useCountTab(filter, currentUser) {
             (!roomInfo.forward || !roomInfo?.forward?.status)
           ) {
             // room cua minh
-            if (roomInfo?.agent?.id === currentUser.id) {
+            if (roomInfo?.agent?.id === currentUser.id || allChat) {
               handleMutationListRoom('REPLACE_TO_FIRST', roomInfo);
             }
             break;
@@ -166,7 +166,7 @@ export function useCountTab(filter, currentUser) {
             }),
           );
           // tăng count lên 1 nếu agent role all chat hoặc room của mình chấp nhận
-          if (triggerByMe) {
+          if (triggerByMe || allChat) {
             if (PROCESSING) {
               if (isSelectChannel(roomInfo)) {
                 handleMutationListRoom('ADD_TO', roomInfo);
@@ -203,7 +203,7 @@ export function useCountTab(filter, currentUser) {
               roomModel: roomInfo,
             }),
           );
-          if (COMPLETE && triggerByMe) {
+          if (COMPLETE && (triggerByMe || allChat)) {
             if (isSelectChannel(roomInfo)) {
               handleMutationListRoom('ADD_TO', roomInfo);
             }
@@ -213,7 +213,7 @@ export function useCountTab(filter, currentUser) {
             });
             break;
           }
-          if (triggerByMe && (PROCESSING || WAITING)) {
+          if ((triggerByMe || allChat) && (PROCESSING || WAITING)) {
             handleMutationListRoom('DELETE', roomInfo);
             handleSaveState({
               waiting: 0,
@@ -239,6 +239,7 @@ export function useCountTab(filter, currentUser) {
       currentUser.id,
       FORWARD,
       COMPLETE,
+      allChat,
     ],
   );
   return {
