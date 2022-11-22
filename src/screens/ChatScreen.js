@@ -9,11 +9,11 @@ import ListRoom from '../components/Chat/ListRoom';
 
 const ChatScreen = () => {
   const { filter } = useSelector(state => state.chat);
-  const { currentUser } = useSelector(state => state.user);
+  const { currentUser, allChat } = useSelector(state => state.user);
 
   const StompSocket = useStompSocket();
 
-  const { countTab } = useCountTab(filter, currentUser);
+  const { countTab } = useCountTab(filter, currentUser, allChat);
 
   const handleWatchListRoom = useCallback(
     event => {
