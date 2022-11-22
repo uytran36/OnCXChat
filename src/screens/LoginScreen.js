@@ -6,16 +6,20 @@ import { requestLogin } from '../services/login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { saveState } from '../../src/store/user';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
 
   const handleClickLogin = async () => {
+    setLoading(true);
     try {
       const res = await requestLogin({ username, password });
-
+      setLoading(false);
       if (res.status === 200) {
         const storeData = async value => {
           try {
@@ -32,10 +36,12 @@ const LoginScreen = () => {
             tokenGateway: `Bearer ${res?.data?.tokenGateway}`,
             currentUser: res?.data?.user?.data?.me,
             userId: res?.data?.user?.data?.userId,
+            refreshToken: res?.data?.refreshToken,
           }),
         );
       }
     } catch (err) {
+      setLoading(false);
       console.log(err);
       Alert.alert('Lỗi', 'Đăng nhập không thành công', [
         { text: 'OK', onPress: () => console.log('OK Pressed') },
@@ -44,41 +50,47 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={background}
-        style={{ width: '100%', height: '100%' }}>
-        <Card style={styles.card}>
-          <Card.Body style={styles.cardBody}>
-            <View style={styles.login}>
-              <Text style={styles.title}>Đăng nhập</Text>
-              <View style={styles.form}>
-                <Text>Tên đăng nhập</Text>
-                <InputItem
-                  value={username}
-                  onChange={value => setUsername(value)}
-                  placeholder="Nhập tên đăng nhập"
-                  type="text"
-                />
+    <>
+      {loading ? (
+        <LoadingOverlay />
+      ) : (
+        <View style={styles.container}>
+          <ImageBackground
+            source={background}
+            style={{ width: '100%', height: '100%' }}>
+            <Card style={styles.card}>
+              <Card.Body style={styles.cardBody}>
+                <View style={styles.login}>
+                  <Text style={styles.title}>Đăng nhập</Text>
+                  <View style={styles.form}>
+                    <Text>Tên đăng nhập</Text>
+                    <InputItem
+                      value={username}
+                      onChange={value => setUsername(value)}
+                      placeholder="Nhập tên đăng nhập"
+                      type="text"
+                    />
 
-                <Text>Mật khẩu</Text>
-                <InputItem
-                  value={password}
-                  onChange={value => setPassword(value)}
-                  placeholder="Nhập mật khẩu"
-                  type="password"
-                />
-              </View>
-            </View>
-            <View style={styles.button}>
-              <Button onPress={handleClickLogin} type="primary">
-                OK
-              </Button>
-            </View>
-          </Card.Body>
-        </Card>
-      </ImageBackground>
-    </View>
+                    <Text>Mật khẩu</Text>
+                    <InputItem
+                      value={password}
+                      onChange={value => setPassword(value)}
+                      placeholder="Nhập mật khẩu"
+                      type="password"
+                    />
+                  </View>
+                </View>
+                <View style={styles.button}>
+                  <Button onPress={handleClickLogin} type="primary">
+                    OK
+                  </Button>
+                </View>
+              </Card.Body>
+            </Card>
+          </ImageBackground>
+        </View>
+      )}
+    </>
   );
 };
 

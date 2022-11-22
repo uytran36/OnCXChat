@@ -127,7 +127,7 @@ const chatSlice = createSlice({
         if (resolve && typeof resolve === 'function') {
           resolve();
         }
-        state.roomInfo = roomModel || {};
+        state.roomInfo = { ...roomInfo, ...(roomModel || {}) };
       }
     },
     updateUserCareRooms: (state, action) => {

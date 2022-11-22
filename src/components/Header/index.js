@@ -1,13 +1,16 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { saveState } from '../../../src/store/user';
 import { Button } from '@ant-design/react-native';
 import { setFilter } from '../../../src/store/chat';
 import { Ionicons } from '@expo/vector-icons';
+import { requestLogout } from '../../services/login';
+import { useHeaders } from '../../contexts';
 
 const Header = props => {
   const dispatch = useDispatch();
+  const headers = useHeaders();
 
   const handleSearch = text => {
     dispatch(
@@ -28,15 +31,26 @@ const Header = props => {
           <AntDesign
             name="logout"
             size={24}
-            onPress={() => {
-              dispatch(
-                saveState({
-                  isLogin: false,
-                  tokenGateway: '',
-                  currentUser: '',
-                  userId: '',
-                }),
-              );
+            onPress={async () => {
+              try {
+                const refreshToken = useSelector(
+                  ({ user }) => user.refreshToken,
+                );
+                const res = await requestLogout(headers, refreshToken);
+                if (res.status === 200) {
+                  dispatch(
+                    saveState({
+                      isLogin: false,
+                      tokenGateway: '',
+                      currentUser: '',
+                      userId: '',
+                      refreshToken: '',
+                    }),
+                  );
+                }
+              } catch (err) {
+                console.log(err);
+              }
             }}
           />
         </Pressable>

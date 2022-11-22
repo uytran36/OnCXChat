@@ -11,6 +11,8 @@ const userSlice = createSlice({
       username: '',
     },
     wsId: '',
+    allChat: true,
+    refreshToken: '',
   },
   reducers: {
     changeLogin: (state, action) => {
