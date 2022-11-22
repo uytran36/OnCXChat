@@ -16,7 +16,7 @@ const fetchListMessage = async (headers, params) => {
       };
     }
   } catch (err) {
-    console.error(err);
+    console.error('fetch list message', err);
     return {
       messages: [],
       nextMessage: null,
@@ -32,7 +32,7 @@ const sendMessageWithAttachments = async (headers, data) => {
     }
     throw new Error(res.data.errorMsg || 'ERROR');
   } catch (err) {
-    console.log(err.toString());
+    console.log('send message', err.toString());
     return false;
   }
 };
@@ -104,7 +104,7 @@ export const useMutationChat = (headers, { roomId }) => {
     try {
       queryClient.invalidateQueries(['list_messages'], { roomId });
     } catch (err) {
-      console.error(err);
+      console.error('refetch list message', err);
     }
   }, [queryClient, roomId]);
 

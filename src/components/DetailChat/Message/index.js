@@ -270,7 +270,7 @@ const Message = ({ messageInfo }) => {
               color="#282525"
               style={styles.replyIcon}
             />
-            <Text>{` ${data?.me ? 'Bạn' : senderName} đã trả lời `}</Text>
+            <Text>{` ${data?.me ? 'Bạn' : data?.senderName} đã trả lời `}</Text>
             <Text style={styles.replyName}>
               {data?.me &&
               data?.messageReply?.senderName === currentUser?.username
