@@ -36,6 +36,7 @@ const LoginScreen = () => {
             tokenGateway: `Bearer ${res?.data?.tokenGateway}`,
             currentUser: res?.data?.user?.data?.me,
             userId: res?.data?.user?.data?.userId,
+            refreshToken: res?.data?.refreshToken,
           }),
         );
       }
