@@ -1,4 +1,4 @@
-import { Entypo } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/Entypo';
 import PropTypes from 'prop-types';
 import { memo, useMemo } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
@@ -98,7 +98,7 @@ const Room = ({ info, onAcceptRoom, onClickRoom }) => {
         )}
         <View style={styles.messageContainer}>
           {data?.forward?.status && (
-            <Entypo name="forward" size={16} color="black" />
+            <Icon name="reply" size={16} color="black" />
           )}
           <Text
             style={[

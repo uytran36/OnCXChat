@@ -11,7 +11,7 @@ export const requestLogin = data => {
 
 export const requestLogout = (headers, refreshToken) => {
   return axios.post(
-    `${api.USER_SERVICE}/logout`,
+    `${api.USER_SERVICE}/users/logout`,
     {
       refreshToken,
     },

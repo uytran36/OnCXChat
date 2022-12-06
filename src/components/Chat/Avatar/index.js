@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
-import { iconAssets } from '../../../../assets/icons/iconAssets';
+import { iconAssets } from '../../../assets/icons/iconAssets';
 
 const Avatar = ({ url, type, name }) => {
   return (

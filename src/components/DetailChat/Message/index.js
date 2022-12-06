@@ -1,4 +1,4 @@
-import { Entypo } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/Entypo';
 import PropTypes from 'prop-types';
 import { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -264,11 +264,11 @@ const Message = ({ messageInfo }) => {
             !data?.me && { marginLeft: 40 },
           ]}>
           <View style={styles.replyInner}>
-            <Entypo
-              name="forward"
+            <Icon
+              name="reply"
               size={16}
               color="#282525"
-              style={styles.replyIcon}
+              // style={styles.replyIcon}
             />
             <Text>{` ${data?.me ? 'Bạn' : data?.senderName} đã trả lời `}</Text>
             <Text style={styles.replyName}>

@@ -1,13 +1,12 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AntDesign } from '@expo/vector-icons';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import * as encoding from 'text-encoding'; // don't remove this line
-import { saveState } from './src/store/user';
 import { Drawer } from '@ant-design/react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import RootContext from './src/contexts';
 import { setFilter } from './src/store/chat';
@@ -86,7 +85,7 @@ const BottomNavigation = () => {
             tabBarLabel: 'Đang chờ',
 
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
+              <Icon
                 name="message-text-clock-outline"
                 size={size}
                 color={color}
@@ -102,11 +101,7 @@ const BottomNavigation = () => {
             title: 'Đã nhận',
             tabBarLabel: 'Đã nhận',
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="message-text-outline"
-                size={size}
-                color={color}
-              />
+              <Icon name="message-text-outline" size={size} color={color} />
             ),
             ...(roomsInfo?.processing && {
               tabBarBadge: roomsInfo?.processing,
