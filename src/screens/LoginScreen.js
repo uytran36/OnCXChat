@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ImageBackground, Alert } from 'react-native';
-import background from '../../assets/background.png';
+import background from '../assets/background.png';
 import { Card, InputItem, Button } from '@ant-design/react-native';
 import { useState } from 'react';
 import { requestLogin } from '../services/login';

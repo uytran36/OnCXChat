@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import {
@@ -53,7 +53,7 @@ const Action = ({ loading, onChangeActionHeight, onSendMessage }) => {
           {loading ? (
             <ActivityIndicator size={24} color="#127ace" />
           ) : (
-            <Ionicons name="send" size={24} color="#127ace" />
+            <Icon name="send" size={24} color="#127ace" />
           )}
         </Pressable>
       </View>
