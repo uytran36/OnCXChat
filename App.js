@@ -1,21 +1,22 @@
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Drawer } from '@ant-design/react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import moment from 'moment';
+import PushNotification from 'react-native-push-notification';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
+import { navigationRef } from './src/utils/rootNavigation';
 import * as encoding from 'text-encoding'; // don't remove this line
-import { Drawer } from '@ant-design/react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { useEffect, useRef } from 'react';
+import Sidebar from './src/components/Chat/Sidebar';
+import CustomHeader from './src/components/Header';
 import RootContext from './src/contexts';
-import { setFilter } from './src/store/chat';
-import LoginScreen from './src/screens/LoginScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
-import CustomHeader from './src/components/Header';
-import { useRef } from 'react';
-import Sidebar from './src/components/Chat/Sidebar';
+import LoginScreen from './src/screens/LoginScreen';
+import { setFilter } from './src/store/chat';
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -117,6 +118,20 @@ const BottomNavigation = () => {
 const Navigation = () => {
   const isLogin = useSelector(state => state?.user?.isLogin ?? false);
 
+  useEffect(() => {
+    createChannels();
+    return () => {
+      PushNotification.deleteChannel('chat-notification');
+    };
+  }, []);
+
+  const createChannels = () => {
+    PushNotification.createChannel({
+      channelId: 'chat-notification',
+      channelName: 'Chat Notification',
+    });
+  };
+
   if (!isLogin) {
     return <LoginScreen />;
   }
@@ -136,7 +151,7 @@ const Navigation = () => {
 export default function App() {
   return (
     <RootContext>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <Navigation />
       </NavigationContainer>
     </RootContext>
