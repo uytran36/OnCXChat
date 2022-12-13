@@ -1,8 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
+import PushNotification from 'react-native-push-notification';
 import { useSelector } from 'react-redux';
 
 import { useStompSocket } from '../contexts/Websocket.context';
+import { stringToNumber } from '../utils';
 import { useCountTab } from '../utils/useCountTab';
 
 import ListRoom from '../components/Chat/ListRoom';
@@ -14,6 +16,17 @@ const ChatScreen = () => {
   const StompSocket = useStompSocket();
 
   const { countTab } = useCountTab(filter, currentUser, allChat);
+
+  const pushNotification = useCallback(room => {
+    const id = stringToNumber(room?.id);
+    PushNotification.localNotification({
+      channelId: 'chat-notification',
+      title: `Bạn có một tin nhắn mới từ room ${room?.roomName}`,
+      message: `${room?.lastMessage?.text}`,
+      id: id,
+      userInfo: room,
+    });
+  }, []);
 
   const handleWatchListRoom = useCallback(
     event => {
@@ -29,6 +42,7 @@ const ChatScreen = () => {
           countTab('NEW_LAST_MESSAGE', {
             roomInfo: room,
           });
+          pushNotification(room);
           break;
         }
         case 'VISITOR_CLOSE_ROOM': {
@@ -85,7 +99,7 @@ const ChatScreen = () => {
           return [];
       }
     },
-    [countTab],
+    [countTab, pushNotification],
   );
 
   useEffect(() => {

@@ -104,3 +104,11 @@ export const converDate = time => {
   }
   return '';
 };
+
+export const stringToNumber = str => {
+  let sum = 0;
+  for (let i = 0; i < str.length; i++) {
+    sum += parseInt(str[i].charCodeAt(0), 10);
+  }
+  return sum;
+};

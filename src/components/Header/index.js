@@ -7,6 +7,7 @@ import { setFilter } from '../../../src/store/chat';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import { requestLogout } from '../../services/login';
 import { useHeaders } from '../../contexts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Header = props => {
   const dispatch = useDispatch();
@@ -37,6 +38,7 @@ const Header = props => {
               try {
                 const res = await requestLogout(headers, refreshToken);
                 if (res.status === 200) {
+                  await AsyncStorage.removeItem('@OnCX:accessToken');
                   dispatch(
                     saveState({
                       isLogin: false,

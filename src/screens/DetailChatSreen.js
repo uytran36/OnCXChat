@@ -9,7 +9,7 @@ const DetailChatScreen = ({ route, navigation }) => {
     navigation.setOptions({
       title: roomName ?? '',
     });
-  }, []);
+  }, [navigation, roomName]);
 
   return <DetailChat roomId={roomId} />;
 };

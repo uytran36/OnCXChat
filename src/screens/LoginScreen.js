@@ -1,12 +1,12 @@
-import { StyleSheet, Text, View, ImageBackground, Alert } from 'react-native';
-import background from '../assets/background.png';
-import { Card, InputItem, Button } from '@ant-design/react-native';
-import { useState } from 'react';
-import { requestLogin } from '../services/login';
+import { Button, Card, InputItem } from '@ant-design/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useLayoutEffect, useState } from 'react';
+import { Alert, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { saveState } from '../../src/store/user';
+import background from '../assets/background.png';
 import LoadingOverlay from '../components/LoadingOverlay';
+import { requestFetchMe, requestLogin } from '../services/login';
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
@@ -15,20 +15,20 @@ const LoginScreen = () => {
 
   const dispatch = useDispatch();
 
+  const storeData = async value => {
+    try {
+      await AsyncStorage.setItem('@OnCX:accessToken', `Bearer ${value}`);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const handleClickLogin = async () => {
     setLoading(true);
     try {
       const res = await requestLogin({ username, password });
       setLoading(false);
       if (res.status === 200) {
-        const storeData = async value => {
-          try {
-            await AsyncStorage.setItem('@accessToken', value);
-          } catch (e) {
-            console.log(e);
-          }
-        };
-
         storeData(res?.data?.tokenGateway);
         dispatch(
           saveState({
@@ -48,6 +48,39 @@ const LoginScreen = () => {
       ]);
     }
   };
+
+  const checkToken = useCallback(async () => {
+    try {
+      setLoading(true);
+      const value = await AsyncStorage.getItem('@OnCX:accessToken');
+      if (value) {
+        const headers = {
+          authorization: value,
+        };
+        const res = await requestFetchMe(headers);
+        setLoading(false);
+        if (res?.status === 200) {
+          dispatch(
+            saveState({
+              isLogin: true,
+              tokenGateway: value,
+              currentUser: res?.data?.me,
+              userId: res?.data?.me?.id,
+            }),
+          );
+        }
+        return;
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  }, [dispatch]);
+
+  useLayoutEffect(() => {
+    checkToken();
+  }, [checkToken]);
 
   return (
     <>

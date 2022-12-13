@@ -18,3 +18,9 @@ export const requestLogout = (headers, refreshToken) => {
     headers,
   );
 };
+
+export const requestFetchMe = headers => {
+  return axios.get(`${api.USER_SERVICE}/users/me`, {
+    headers: headers,
+  });
+};
