@@ -32,7 +32,7 @@ function useSetupWebsocket(currentUser, token, wsId) {
     return () => {
       NewSetupSocket.onDisconnect();
     };
-  }, [dispatch, token, wsId, isLogin]);
+  }, [dispatch, token, wsId, isLogin, currentUser]);
 
   return { ws: NewSetupSocket };
 }

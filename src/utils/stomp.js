@@ -66,7 +66,7 @@ export class SetupSocket {
             console.log('connected socket');
           },
           onStompError: frame => {
-            console.log('Broker reported error: ' + frame.headers['message']);
+            console.log('Broker reported error: ' + frame.headers.message);
             console.log('Additional details: ' + frame.body);
           },
         });

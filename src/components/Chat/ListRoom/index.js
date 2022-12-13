@@ -66,7 +66,7 @@ const ListRoom = () => {
         },
         {
           username: currentUser.username,
-          id: headers['userId'],
+          id: headers.userId,
           avatar: `${chatConstants.AVATAR_AGENT_BASE_URL}/${currentUser.username}`,
         },
       );
@@ -77,7 +77,7 @@ const ListRoom = () => {
       Alert.alert(`Bạn không thể nhận cuộc hội thoại của ${roomName}!`);
       return null;
     },
-    [headers],
+    [currentUser.username, headers],
   );
 
   const readMessage = useCallback(
@@ -96,7 +96,7 @@ const ListRoom = () => {
       }
       navigation.navigate('DetailChat', { roomId, roomName });
     },
-    [],
+    [currentUser?.id, navigation],
   );
 
   const renderItem = useCallback(
@@ -107,7 +107,7 @@ const ListRoom = () => {
         onClickRoom={handleClickRoom}
       />
     ),
-    [],
+    [handleAcceptRoom, handleClickRoom],
   );
 
   const keyExtractor = useCallback(item => item.id, []);
@@ -127,7 +127,7 @@ const ListRoom = () => {
         dispatch(saveLoadMore(res.data.response.roomsInfo));
       }
     }
-  }, [headers, filter, roomsInfo, isLoadMore, isMounted]);
+  }, [isMounted, isLoadMore, roomsInfo.next, filter, dispatch, headers]);
 
   if (isFetching) {
     return <Loading />;
