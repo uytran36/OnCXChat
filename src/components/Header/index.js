@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, SafeAreaView } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveState } from '../../../src/store/user';
@@ -27,7 +27,7 @@ const Header = props => {
   };
 
   return (
-    <View style={styles.headerWrapper}>
+    <SafeAreaView style={styles.headerWrapper}>
       <View style={styles.headerTitleWrapper}>
         <Text style={styles.headerTitle}>{props.options.title}</Text>
         <Pressable>
@@ -74,7 +74,7 @@ const Header = props => {
           <IonIcon name="filter-outline" size={24} color="black" />
         </Button>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -83,22 +83,15 @@ export default Header;
 const styles = StyleSheet.create({
   headerWrapper: {
     // alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
   headerTitleWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     backgroundColor: 'white',
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-
-    elevation: 4,
   },
   headerTitle: {
     fontSize: 20,

@@ -1,7 +1,7 @@
 import Icon from 'react-native-vector-icons/Entypo';
 import PropTypes from 'prop-types';
 import { memo, useMemo } from 'react';
-import { Platform, Pressable, Text, View } from 'react-native';
+import {Platform, Pressable, Text, View} from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { capitalizeFirstLetter, convertTimeToDate } from '../../../utils';

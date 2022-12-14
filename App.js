@@ -1,10 +1,15 @@
 import { Drawer } from '@ant-design/react-native';
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable prettier/prettier */
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import messaging from '@react-native-firebase/messaging';
+// import { db } from './configFirebase';
+import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import PushNotification from 'react-native-push-notification';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { navigationRef } from './src/utils/rootNavigation';
 import * as encoding from 'text-encoding'; // don't remove this line
@@ -17,6 +22,35 @@ import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { setFilter } from './src/store/chat';
+import { navigate } from './src/utils/rootNavigation';
+
+async function requestUserPermission() {
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (enabled) {
+    console.log('Authorization status:', authStatus);
+  }
+}
+
+async function getToken() {
+  const deviceToken = await messaging().getToken();
+}
+
+function saveTokenToFireStore(token) {
+  console.log(token);
+  firestore()
+    .collection('tokenNotification')
+    .add({
+      token,
+    })
+    .then(() => {
+      console.log('ok');
+    })
+    .catch(err => console.log(err));
+}
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -123,6 +157,42 @@ const Navigation = () => {
     return () => {
       PushNotification.deleteChannel('chat-notification');
     };
+  }, []);
+
+  useEffect(() => {
+    messaging()
+      .getToken()
+      .then(async token => {
+        saveTokenToFireStore(token);
+      });
+    return messaging().onTokenRefresh(async token => {
+      saveTokenToFireStore(token);
+    });
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      // await requestUserPermission();
+      // await getToken();
+
+      messaging().onNotificationOpenedApp(remoteMessage => {
+        const { room } = remoteMessage.data;
+        const data = JSON.parse(room);
+        if (data?.status === 'WAITING') {
+          navigate('Chat');
+        } else if (data?.status === 'PROCESSING') {
+          navigate('DetailChat', {
+            roomId: data?.id,
+            roomName: data?.roomName,
+          });
+        }
+      });
+
+      // const unsubscribe = messaging().onMessage(async remoteMessage => {
+      //   console.log('asd');
+      // });
+      // return unsubscribe;
+    })();
   }, []);
 
   const createChannels = () => {
