@@ -35,21 +35,34 @@ async function requestUserPermission() {
   }
 }
 
-async function getToken() {
-  const deviceToken = await messaging().getToken();
-}
-
-function saveTokenToFireStore(token) {
-  console.log(token);
-  firestore()
+const getTokenFromFireStore = async () => {
+  const token = [];
+  await firestore()
     .collection('tokenNotification')
-    .add({
-      token,
-    })
-    .then(() => {
-      console.log('ok');
-    })
-    .catch(err => console.log(err));
+    .get()
+    .then(res => {
+      res.docs.map(x => {
+        console.log(x.data().token);
+        token.push(x.data().token);
+      });
+    });
+  if (token.length !== 0) return token;
+  return '';
+};
+
+async function saveTokenToFireStore(token) {
+  const tokenFireStore = await getTokenFromFireStore();
+  if (!tokenFireStore?.includes(token)) {
+    firestore()
+      .collection('tokenNotification')
+      .add({
+        token,
+      })
+      .then(() => {
+        console.log('add token successfully');
+      })
+      .catch(err => console.log(err));
+  }
 }
 
 moment.updateLocale('vi', {
@@ -153,13 +166,6 @@ const Navigation = () => {
   const isLogin = useSelector(state => state?.user?.isLogin ?? false);
 
   useEffect(() => {
-    createChannels();
-    return () => {
-      PushNotification.deleteChannel('chat-notification');
-    };
-  }, []);
-
-  useEffect(() => {
     messaging()
       .getToken()
       .then(async token => {
@@ -188,19 +194,21 @@ const Navigation = () => {
         }
       });
 
-      // const unsubscribe = messaging().onMessage(async remoteMessage => {
-      //   console.log('asd');
-      // });
-      // return unsubscribe;
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        const { room } = remoteMessage.data;
+        const data = JSON.parse(room);
+        if (data?.status === 'WAITING') {
+          navigate('Chat');
+        } else if (data?.status === 'PROCESSING') {
+          navigate('DetailChat', {
+            roomId: data?.id,
+            roomName: data?.roomName,
+          });
+        }
+      });
+      return unsubscribe;
     })();
   }, []);
-
-  const createChannels = () => {
-    PushNotification.createChannel({
-      channelId: 'chat-notification',
-      channelName: 'Chat Notification',
-    });
-  };
 
   if (!isLogin) {
     return <LoginScreen />;
