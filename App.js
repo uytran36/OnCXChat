@@ -42,24 +42,39 @@ const getTokenFromFireStore = async () => {
     .get()
     .then(res => {
       res.docs.map(x => {
-        console.log(x.data().token);
         token.push(x.data().token);
       });
     });
   if (token.length !== 0) return token;
-  return '';
+  return [];
 };
 
-async function saveTokenToFireStore(token) {
+const getIdFromFireStore = async () => {
+  const ids = [];
+  await firestore()
+    .collection('tokenNotification')
+    .get()
+    .then(res => {
+      res.docs.map(x => {
+        ids.push(x.data().id);
+      });
+    });
+  if (ids.length !== 0) return ids;
+  return [];
+};
+
+async function saveDataToFireStore(token, id) {
   const tokenFireStore = await getTokenFromFireStore();
-  if (!tokenFireStore?.includes(token)) {
+  const idFireStore = await getIdFromFireStore();
+  if (!tokenFireStore?.includes(token) && !idFireStore?.includes(id)) {
     firestore()
       .collection('tokenNotification')
       .add({
         token,
+        id,
       })
       .then(() => {
-        console.log('add token successfully');
+        console.log('add data successfully');
       })
       .catch(err => console.log(err));
   }
@@ -164,17 +179,33 @@ const BottomNavigation = () => {
 
 const Navigation = () => {
   const isLogin = useSelector(state => state?.user?.isLogin ?? false);
+  const { currentUser } = useSelector(state => state?.user);
 
   useEffect(() => {
-    messaging()
-      .getToken()
-      .then(async token => {
-        saveTokenToFireStore(token);
+    if (currentUser?.id) {
+      messaging()
+        .getToken()
+        .then(async token => {
+          const idFireStore = await getIdFromFireStore();
+          if (!idFireStore?.includes(currentUser?.id)) {
+            firestore()
+              .collection('tokenNotification')
+              .where('token', '==', token)
+              .get()
+              .then(res => {
+                console.log('delete successfully')
+                res.forEach(doc => {
+                  doc.ref.delete();
+                })
+              });
+          }
+          saveDataToFireStore(token, currentUser?.id || '');
+        });
+      return messaging().onTokenRefresh(async token => {
+        saveDataToFireStore(token, currentUser?.id || '');
       });
-    return messaging().onTokenRefresh(async token => {
-      saveTokenToFireStore(token);
-    });
-  }, []);
+    }
+  }, [currentUser?.id]);
 
   useEffect(() => {
     (async () => {
