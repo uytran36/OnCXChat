@@ -21,7 +21,7 @@ const ChatScreen = () => {
     const id = stringToNumber(room?.id);
     PushNotification.localNotification({
       channelId: 'chat-notification',
-      title: `Bạn có một tin nhắn mới từ room ${room?.roomName}`,
+      title: `${room?.lastMessage?.senderName} gửi tới ${room?.roomName}`,
       message: `${room?.lastMessage?.text}`,
       id: id,
       userInfo: room,
@@ -42,7 +42,7 @@ const ChatScreen = () => {
           countTab('NEW_LAST_MESSAGE', {
             roomInfo: room,
           });
-          pushNotification(room);
+          // pushNotification(room);
           break;
         }
         case 'VISITOR_CLOSE_ROOM': {

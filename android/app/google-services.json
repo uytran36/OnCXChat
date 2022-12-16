@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "381998561358",
+    "project_id": "oncx-test-nofitication-app",
+    "storage_bucket": "oncx-test-nofitication-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381998561358:android:1de3db8b2a3a36d7a3eb1f",
+        "android_client_info": {
+          "package_name": "com.oncxchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381998561358-5d9d7olfm14crn0ims48pep8c38rfhqu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQ5p1xAo7cOvF87nJ4xFZt2nTTgPXLrrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381998561358-5d9d7olfm14crn0ims48pep8c38rfhqu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

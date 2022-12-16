@@ -1,10 +1,15 @@
 import { Drawer } from '@ant-design/react-native';
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable prettier/prettier */
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import messaging from '@react-native-firebase/messaging';
+// import { db } from './configFirebase';
+import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import PushNotification from 'react-native-push-notification';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { navigationRef } from './src/utils/rootNavigation';
 import * as encoding from 'text-encoding'; // don't remove this line
@@ -17,6 +22,63 @@ import ChatScreen from './src/screens/ChatScreen';
 import DetailChatScreen from './src/screens/DetailChatSreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { setFilter } from './src/store/chat';
+import { navigate } from './src/utils/rootNavigation';
+
+async function requestUserPermission() {
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (enabled) {
+    console.log('Authorization status:', authStatus);
+  }
+}
+
+const getTokenFromFireStore = async () => {
+  const token = [];
+  await firestore()
+    .collection('tokenNotification')
+    .get()
+    .then(res => {
+      res.docs.map(x => {
+        token.push(x.data().token);
+      });
+    });
+  if (token.length !== 0) return token;
+  return [];
+};
+
+const getIdFromFireStore = async () => {
+  const ids = [];
+  await firestore()
+    .collection('tokenNotification')
+    .get()
+    .then(res => {
+      res.docs.map(x => {
+        ids.push(x.data().id);
+      });
+    });
+  if (ids.length !== 0) return ids;
+  return [];
+};
+
+async function saveDataToFireStore(token, id) {
+  const tokenFireStore = await getTokenFromFireStore();
+  const idFireStore = await getIdFromFireStore();
+  if (!tokenFireStore?.includes(token) && !idFireStore?.includes(id)) {
+    firestore()
+      .collection('tokenNotification')
+      .add({
+        token,
+        id,
+      })
+      .then(() => {
+        console.log('add data successfully');
+      })
+      .catch(err => console.log(err));
+  }
+}
 
 moment.updateLocale('vi', {
   relativeTime: {
@@ -117,20 +179,67 @@ const BottomNavigation = () => {
 
 const Navigation = () => {
   const isLogin = useSelector(state => state?.user?.isLogin ?? false);
+  const { currentUser } = useSelector(state => state?.user);
 
   useEffect(() => {
-    createChannels();
-    return () => {
-      PushNotification.deleteChannel('chat-notification');
-    };
-  }, []);
+    if (currentUser?.id) {
+      messaging()
+        .getToken()
+        .then(async token => {
+          const idFireStore = await getIdFromFireStore();
+          if (!idFireStore?.includes(currentUser?.id)) {
+            firestore()
+              .collection('tokenNotification')
+              .where('token', '==', token)
+              .get()
+              .then(res => {
+                console.log('delete successfully')
+                res.forEach(doc => {
+                  doc.ref.delete();
+                })
+              });
+          }
+          saveDataToFireStore(token, currentUser?.id || '');
+        });
+      return messaging().onTokenRefresh(async token => {
+        saveDataToFireStore(token, currentUser?.id || '');
+      });
+    }
+  }, [currentUser?.id]);
 
-  const createChannels = () => {
-    PushNotification.createChannel({
-      channelId: 'chat-notification',
-      channelName: 'Chat Notification',
-    });
-  };
+  useEffect(() => {
+    (async () => {
+      // await requestUserPermission();
+      // await getToken();
+
+      messaging().onNotificationOpenedApp(remoteMessage => {
+        const { room } = remoteMessage.data;
+        const data = JSON.parse(room);
+        if (data?.status === 'WAITING') {
+          navigate('Chat');
+        } else if (data?.status === 'PROCESSING') {
+          navigate('DetailChat', {
+            roomId: data?.id,
+            roomName: data?.roomName,
+          });
+        }
+      });
+
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        const { room } = remoteMessage.data;
+        const data = JSON.parse(room);
+        if (data?.status === 'WAITING') {
+          navigate('Chat');
+        } else if (data?.status === 'PROCESSING') {
+          navigate('DetailChat', {
+            roomId: data?.id,
+            roomName: data?.roomName,
+          });
+        }
+      });
+      return unsubscribe;
+    })();
+  }, []);
 
   if (!isLogin) {
     return <LoginScreen />;

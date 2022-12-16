@@ -1,23 +1,24 @@
-import { useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, VirtualizedList } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import {useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import {Alert, VirtualizedList} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useDispatch, useSelector} from 'react-redux';
 
-import { chatConstants } from '../../../constants/chat';
-import { useHeaders } from '../../../contexts';
+import {chatConstants} from '../../../constants/chat';
+import {useHeaders} from '../../../contexts';
 import {
   requestAcceptRoom,
   requestGetRoomsInfo,
   requestReadMessage,
 } from '../../../services/chat';
-import { saveLoadMore, saveState, setFilter } from '../../../store/chat';
+import {saveLoadMore, saveState, setFilter} from '../../../store/chat';
 
 import Loading from '../../Loading';
 import Room from '../Room';
 
 const ListRoom = () => {
-  const { filter, roomsInfo } = useSelector(state => state.chat);
-  const { currentUser } = useSelector(state => state.user);
+  const {filter, roomsInfo} = useSelector(state => state.chat);
+  const {currentUser} = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const navigation = useNavigation();
@@ -83,7 +84,7 @@ const ListRoom = () => {
   const readMessage = useCallback(
     async roomId => {
       if (!roomId) return;
-      const res = await requestReadMessage(headers, { roomId });
+      const res = await requestReadMessage(headers, {roomId});
       console.log(res);
     },
     [headers],
@@ -94,13 +95,13 @@ const ListRoom = () => {
       if (isUnread && agent?.id === currentUser?.id) {
         // readMessage(roomId);
       }
-      navigation.navigate('DetailChat', { roomId, roomName });
+      navigation.navigate('DetailChat', {roomId, roomName});
     },
     [currentUser?.id, navigation],
   );
 
   const renderItem = useCallback(
-    ({ item }) => (
+    ({item}) => (
       <Room
         info={item}
         onAcceptRoom={handleAcceptRoom}
@@ -118,8 +119,8 @@ const ListRoom = () => {
 
   const handleLoadMore = useCallback(async () => {
     if (isMounted && !isLoadMore && roomsInfo.next) {
-      const newFilter = { ...filter, page: filter.page + 1 };
-      dispatch(setFilter({ page: filter.page + 1 }));
+      const newFilter = {...filter, page: filter.page + 1};
+      dispatch(setFilter({page: filter.page + 1}));
       setIsLoadMore(true);
       const res = await requestGetRoomsInfo(headers, newFilter);
       setIsLoadMore(false);
