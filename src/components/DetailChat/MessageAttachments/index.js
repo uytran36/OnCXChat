@@ -1,8 +1,22 @@
 import PropTypes from 'prop-types';
-import { memo, useMemo } from 'react';
-import { StyleSheet, View, Image, Dimensions, Pressable } from 'react-native';
+import { memo, useMemo, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Image,
+  Dimensions,
+  Pressable,
+  Text,
+  Modal,
+} from 'react-native';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 const MessageAttachments = ({ attachments, id, isMe }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [dataModal, setDataModal] = useState([]);
+  const [initIndex, setInitIndex] = useState(0);
+
   const replacePayloadURL = str => {
     if (!str) return '';
     else {
@@ -42,7 +56,14 @@ const MessageAttachments = ({ attachments, id, isMe }) => {
     return (
       <View style={styles.imgOneWrapper}>
         <Pressable
-          onPress={() => console.log('press')}
+          onPress={() => {
+            setDataModal([
+              {
+                url: replacePayloadURL(image.payloadUrl),
+              },
+            ]);
+            setIsVisible(true);
+          }}
           style={styles.pressable}>
           <Image
             style={styles.img}
@@ -56,12 +77,17 @@ const MessageAttachments = ({ attachments, id, isMe }) => {
   const renderTwo = _images => {
     return (
       <View style={styles.imgTwoWrapper}>
-        {console.log(
-          _images.map((img, index) => replacePayloadURL(img.payloadUrl)),
-        )}
         {_images.map((img, index) => (
           <Pressable
-            onPress={() => console.log('press')}
+            onPress={() => {
+              setDataModal(
+                _images.map(image => ({
+                  url: replacePayloadURL(image.payloadUrl),
+                })),
+              );
+              setInitIndex(index);
+              setIsVisible(true);
+            }}
             key={index}
             style={styles.pressable}>
             <Image
@@ -80,7 +106,15 @@ const MessageAttachments = ({ attachments, id, isMe }) => {
       <View style={styles.imgThreeWrapper}>
         {images.map((img, index) => (
           <Pressable
-            onPress={() => console.log('press')}
+            onPress={() => {
+              setDataModal(
+                images.map(image => ({
+                  url: replacePayloadURL(image.payloadUrl),
+                })),
+              );
+              setInitIndex(index);
+              setIsVisible(true);
+            }}
             key={index}
             style={styles.pressable}>
             <Image
@@ -128,6 +162,26 @@ const MessageAttachments = ({ attachments, id, isMe }) => {
     <View>
       {renderImage}
       {/* {renderVideo} */}
+      <Modal visible={isVisible} transparent={false}>
+        <ImageViewer
+          imageUrls={dataModal}
+          index={initIndex}
+          enableSwipeDown
+          onSwipeDown={() => setIsVisible(false)}
+          renderHeader={() => (
+            <View style={styles.header}>
+              <Pressable onPress={() => setIsVisible(false)}>
+                <EvilIcons
+                  name="close"
+                  size={24}
+                  color="white"
+                  style={{ alignSelf: 'flex-end' }}
+                />
+              </Pressable>
+            </View>
+          )}
+        />
+      </Modal>
     </View>
   );
 };
@@ -198,4 +252,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   imgThree: { width: '100%', height: '100%', resizeMode: 'cover' },
+  header: {
+    textAlign: 'right',
+  },
 });
