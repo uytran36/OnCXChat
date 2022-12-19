@@ -10,6 +10,7 @@ import { diffTimeInMinutes, formatDate } from '../../../utils';
 import MessageAvatar from '../MessageAvatar';
 import MessageBubble from '../MessageBubble';
 import MessageText from '../MessageText';
+import MessageAttachments from '../MessageAttachments';
 
 const Message = ({ messageInfo }) => {
   const { message, index, listMessage } = messageInfo;
@@ -138,114 +139,6 @@ const Message = ({ messageInfo }) => {
     );
   };
 
-  const renderContent = () => [
-    data?.msg &&
-      (data?.messageReply ? (
-        <View key={data?.mid}>
-          {data?.messageReply?.attachments &&
-          data?.messageReply?.attachments.length > 0 &&
-          (data?.messageReply?.attachments[0]?.type === 'image' ||
-            data?.messageReply?.attachments[0]?.type === 'gif' ||
-            data?.messageReply?.attachments[0]?.type === 'sticker') ? (
-            // Reply ảnh bằng text
-            // <MessageBubble
-            //   reply={true}
-            //   position={position}
-            //   isImage
-            //   nude
-            //   ts={ts}
-            //   inverse={me}
-            //   quoted={quoted}
-            //   other={!customer && !me}>
-            //   <GridImages
-            //     mid={mid}
-            //     images={messageReply?.attachments}
-            //     onLoad={onLoadAttachment}
-            //     scrollIntoReply={() => handleScrollToReply(messageReply?.mid)}
-            //   />
-            // </MessageBubble>
-            <Text>Chưa làm ={')))'}</Text>
-          ) : (
-            // Reply text bằng text
-            <MessageBubble
-              // ts={ts}
-              reply={true}
-              replyCustomer={data?.customer}
-              inverse={data?.me}
-              quoted={data?.quoted}
-              other={!data?.customer && !data?.me}
-              position={data?.position}
-              style={{
-                backgroundColor: '#fff',
-              }}
-              // onClick={() => handleScrollToReply(messageReply?.mid)}
-            >
-              <MessageText
-                reply={true}
-                text={data?.messageReply?.text || 'Tệp đính kèm'}
-                customer={data?.customer}
-                system={data?.system}
-                inverse={data?.me}
-                other={!data?.customer && !data?.me}
-                style={{ opacity: 0.45, color: '#000', fontSize: 12 }}
-              />
-            </MessageBubble>
-          )}
-          <View>
-            <MessageBubble
-              ts={data?.ts}
-              inverse={data?.me}
-              quoted={data?.quoted}
-              other={!data?.customer && !data?.me}
-              position={data?.position}
-              style={{ marginTop: -8 }}>
-              <MessageText
-                mid={data?.mid}
-                customer={data?.customer}
-                text={data?.msg}
-                system={data?.system}
-                inverse={data?.me}
-                other={!data?.customer && !data?.me}
-              />
-            </MessageBubble>
-            {/* {(roomInfo?.type === 'LIVECHAT' || roomInfo?.type === 'ZALO') && (
-              <div
-                className={classNames(styles['reply-message-icon'], {
-                  [styles['reply-message-icon__reverse']]: !me,
-                })}
-                hidden={hideReply}>
-                <Tooltip title="Trả lời">
-                  <Button
-                    id={`reply-button-${mid}`}
-                    className={styles['reply-button']}
-                    icon={<Icon component={IconReply} />}
-                    onClick={handleClickReply}
-                  />
-                </Tooltip>
-              </div>
-            )} */}
-          </View>
-        </View>
-      ) : (
-        <MessageBubble
-          key={data?.mid}
-          ts={data?.ts}
-          inverse={data?.me}
-          quoted={data?.quoted}
-          other={!data?.customer && !data?.me}
-          position={data?.position}>
-          <MessageText
-            mid={data?.mid}
-            customer={data?.customer}
-            text={data?.msg}
-            system={data?.system}
-            inverse={data?.me}
-            other={!data?.customer && !data?.me}
-          />
-        </MessageBubble>
-      )),
-  ];
-
   return (
     <View style={styles.container}>
       {renderAction(data?.actionMessage, ['ALL_CHAT'])}
@@ -299,7 +192,123 @@ const Message = ({ messageInfo }) => {
             senderId={data?.senderId}
           />
         )}
-        <View style={styles.messageContent}>{renderContent()}</View>
+
+        <View style={styles.messageContent}>
+          {data?.msg && data?.messageReply ? (
+            <View key={data?.mid}>
+              {data?.messageReply?.attachments &&
+              data?.messageReply?.attachments.length > 0 &&
+              (data?.messageReply?.attachments[0]?.type === 'image' ||
+                data?.messageReply?.attachments[0]?.type === 'gif' ||
+                data?.messageReply?.attachments[0]?.type === 'sticker') ? (
+                // Reply ảnh bằng text
+                // <MessageBubble
+                //   reply={true}
+                //   position={position}
+                //   isImage
+                //   nude
+                //   ts={ts}
+                //   inverse={me}
+                //   quoted={quoted}
+                //   other={!customer && !me}>
+                //   <GridImages
+                //     mid={mid}
+                //     images={messageReply?.attachments}
+                //     onLoad={onLoadAttachment}
+                //     scrollIntoReply={() => handleScrollToReply(messageReply?.mid)}
+                //   />
+                // </MessageBubble>
+                <MessageAttachments
+                  attachments={data?.messageReply?.attachments}
+                  id={data?.senderId}
+                  isMe={data?.me}
+                />
+              ) : (
+                // Reply text bằng text
+                <MessageBubble
+                  // ts={ts}
+                  reply={true}
+                  replyCustomer={data?.customer}
+                  inverse={data?.me}
+                  quoted={data?.quoted}
+                  other={!data?.customer && !data?.me}
+                  position={data?.position}
+                  style={{
+                    backgroundColor: '#fff',
+                  }}
+                  // onClick={() => handleScrollToReply(messageReply?.mid)}
+                >
+                  <MessageText
+                    reply={true}
+                    text={data?.messageReply?.text || 'Tệp đính kèm'}
+                    customer={data?.customer}
+                    system={data?.system}
+                    inverse={data?.me}
+                    other={!data?.customer && !data?.me}
+                    style={{ opacity: 0.45, color: '#000', fontSize: 12 }}
+                  />
+                </MessageBubble>
+              )}
+              <View>
+                <MessageBubble
+                  ts={data?.ts}
+                  inverse={data?.me}
+                  quoted={data?.quoted}
+                  other={!data?.customer && !data?.me}
+                  position={data?.position}
+                  style={{ marginTop: -8 }}>
+                  <MessageText
+                    mid={data?.mid}
+                    customer={data?.customer}
+                    text={data?.msg}
+                    system={data?.system}
+                    inverse={data?.me}
+                    other={!data?.customer && !data?.me}
+                  />
+                </MessageBubble>
+                {/* {(roomInfo?.type === 'LIVECHAT' || roomInfo?.type === 'ZALO') && (
+              <div
+                className={classNames(styles['reply-message-icon'], {
+                  [styles['reply-message-icon__reverse']]: !me,
+                })}
+                hidden={hideReply}>
+                <Tooltip title="Trả lời">
+                  <Button
+                    id={`reply-button-${mid}`}
+                    className={styles['reply-button']}
+                    icon={<Icon component={IconReply} />}
+                    onClick={handleClickReply}
+                  />
+                </Tooltip>
+              </div>
+            )} */}
+              </View>
+            </View>
+          ) : data?.message?.attachments?.length > 0 ? (
+            <MessageAttachments
+              attachments={data?.message?.attachments}
+              id={data?.senderId}
+              isMe={data?.me}
+            />
+          ) : (
+            <MessageBubble
+              key={data?.mid}
+              ts={data?.ts}
+              inverse={data?.me}
+              quoted={data?.quoted}
+              other={!data?.customer && !data?.me}
+              position={data?.position}>
+              <MessageText
+                mid={data?.mid}
+                customer={data?.customer}
+                text={data?.msg}
+                system={data?.system}
+                inverse={data?.me}
+                other={!data?.customer && !data?.me}
+              />
+            </MessageBubble>
+          )}
+        </View>
       </View>
       {renderAction(
         data?.actionMessage,

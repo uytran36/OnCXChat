@@ -1,6 +1,13 @@
 import Icon from 'react-native-vector-icons/Ionicons';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import DocumentPicker, {
+  DirectoryPickerResponse,
+  DocumentPickerResponse,
+  isInProgress,
+  types,
+} from 'react-native-document-picker';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -8,10 +15,50 @@ import {
   StyleSheet,
   TextInput,
   View,
+  Alert,
 } from 'react-native';
+import { useMutationChat } from '../Hooks/useChat';
 
-const Action = ({ loading, onChangeActionHeight, onSendMessage }) => {
+const Action = ({
+  loading,
+  onChangeActionHeight,
+  onSendMessage,
+  roomId,
+  headers,
+}) => {
   const [text, setText] = useState('');
+
+  const {
+    sendMessageWithAttachments: { onSendMessage: onSendMessageWithAttachments },
+  } = useMutationChat(headers, {
+    roomId,
+  });
+
+  const handleDocumentSelection = useCallback(async () => {
+    try {
+      const fileUploads = await DocumentPicker.pickMultiple({
+        presentationStyle: 'fullScreen',
+        type: ['image/png', 'image/jpeg', 'video/mp4'],
+      });
+      const formData = new FormData();
+      if (fileUploads.length > 0) {
+        for (let i = 0; i < fileUploads.length; i++) {
+          formData.append('files', fileUploads[i]);
+        }
+        formData.append('typeMessage', 'file');
+      }
+      formData.append('roomId', roomId);
+      if (text) {
+        formData.append('text', text);
+      }
+      const sended = await onSendMessageWithAttachments(formData);
+      if (!sended) {
+        Alert.alert('Lỗi hệ thống vui lòng gửi lại tin nhắn.');
+      }
+    } catch (err) {
+      // console.warn(err);
+    }
+  }, [onSendMessageWithAttachments, roomId, text]);
 
   const handleChangeText = text => {
     setText(text);
@@ -31,6 +78,9 @@ const Action = ({ loading, onChangeActionHeight, onSendMessage }) => {
 
   return (
     <View style={styles.container}>
+      <Pressable onPress={handleDocumentSelection}>
+        <EvilIcons name="image" size={24} color="black" />
+      </Pressable>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Nhắn tin"

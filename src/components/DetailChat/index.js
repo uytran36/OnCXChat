@@ -113,6 +113,8 @@ const DetailChat = ({ roomId }) => {
           loading={isSendingMessageWithAttachments}
           onChangeActionHeight={handleChangeActionHeight}
           onSendMessage={handleSendMessage}
+          roomId={roomId}
+          headers={headers}
         />
       </View>
     </View>
