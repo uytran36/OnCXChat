@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,11 +11,13 @@ import {
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import Video from 'react-native-video';
 
 const MessageAttachments = ({ attachments, id, isMe }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [dataModal, setDataModal] = useState([]);
   const [initIndex, setInitIndex] = useState(0);
+  const videoRef = useRef(null);
 
   const replacePayloadURL = str => {
     if (!str) return '';
@@ -148,20 +150,28 @@ const MessageAttachments = ({ attachments, id, isMe }) => {
 
   const renderVideo = attachments &&
     attachments[0]?.type?.includes('video') && (
-      <View
-        key={id}
-        style={{ justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
-        {/* <Video
-          source={{ uri: replacePayloadURL(attachments[0]?.payloadUrl) }} // Can be a URL or a local file.
-          onError={videoError} // Callback when video cannot be loaded
-        /> */}
+      <View key={id} style={styles.videoWrapper}>
+        <Pressable
+          onPress={() => this.player.presentFullscreenPlayer()}
+          style={styles.pressable}>
+          <Video
+            controls
+            // repeat
+            playInBackground={false}
+            playWhenInactive={false}
+            ref={ref => (this.player = ref)}
+            style={styles.video}
+            source={{ uri: replacePayloadURL(attachments[0]?.payloadUrl) }} // Can be a URL or a local file.
+            onError={videoError} // Callback when video cannot be loaded
+          />
+        </Pressable>
       </View>
     );
 
   return (
     <View>
       {renderImage}
-      {/* {renderVideo} */}
+      {renderVideo}
       <Modal visible={isVisible} transparent={false}>
         <ImageViewer
           imageUrls={dataModal}
@@ -254,5 +264,13 @@ const styles = StyleSheet.create({
   imgThree: { width: '100%', height: '100%', resizeMode: 'cover' },
   header: {
     textAlign: 'right',
+  },
+  videoWrapper: {
+    width: Dimensions.get('window').width / 2 - 10,
+    height: Dimensions.get('window').width / 2 - 10,
+  },
+  video: {
+    width: '100%',
+    height: '100%',
   },
 });
